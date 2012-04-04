@@ -18,5 +18,6 @@ end
 
 class IntegrationTest < MiniTest::Spec
   include Capybara::DSL
-  register_spec_type(/integration$/, self)
 end
+
+MiniTest::Spec.register_spec_type(/integration$/, IntegrationTest)
