@@ -17,15 +17,22 @@ module PaginatedTable
       @columns = []
     end
 
-    def column(name)
-      @columns << Column.new(name)
+    def column(name, &block)
+      @columns << Column.new(name, &block)
     end
 
     class Column
-      attr_reader :name
-
-      def initialize(name)
+      def initialize(name, &block)
         @name = name
+        @block = block
+      end
+
+      def render_cell(datum)
+        if @block
+          @block.call(datum)
+        else
+          datum.send(@name)
+        end
       end
     end
   end
@@ -59,8 +66,12 @@ module PaginatedTable
 
     def render_cells(datum)
       @view.safe_join(@description.columns.map { |column|
-        @view.content_tag('td', datum.send(column.name))
+        @view.content_tag('td', render_cell_content(column, datum))
       })
+    end
+
+    def render_cell_content(column, datum)
+      column.render_cell(datum)
     end
   end
 end

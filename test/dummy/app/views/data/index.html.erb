@@ -1,3 +1,6 @@
 <%= paginated_table(@data) do |t|
   t.column :name
+  t.column :link do |datum|
+    link_to(datum.id.to_s, "/data/#{datum.id}")
+  end
 end %>

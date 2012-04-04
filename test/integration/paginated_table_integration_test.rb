@@ -13,10 +13,17 @@ describe "paginated_table integration" do
     page.has_xpath?(tr_xpath(11)).must_equal false
   end
 
-  it "renders the first column of data names" do
+  it "renders the data names in the first column" do
     visit "/data"
     (1..10).each do |row|
       page.has_xpath?("#{tr_xpath(row)}/td[1][.='Name #{row}']").must_equal true
+    end
+  end
+
+  it "renders links to the data in the second column" do
+    visit "/data"
+    (1..10).each do |row|
+      page.has_xpath?("#{tr_xpath(row)}/td[2]/a[@href='/data/#{row}'][.='#{row}']").must_equal true
     end
   end
 
