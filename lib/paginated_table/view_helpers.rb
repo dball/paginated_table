@@ -27,6 +27,10 @@ module PaginatedTable
         @block = block
       end
 
+      def render_header
+        @name.to_s.titleize
+      end
+
       def render_cell(datum)
         if @block
           @block.call(datum)
@@ -50,15 +54,29 @@ module PaginatedTable
 
     def render_table
       @view.content_tag('table', :class => 'paginated') do
-        @view.content_tag('tbody') do
-          render_rows
+        render_table_header + render_table_body
+      end
+    end
+
+    def render_table_header
+      @view.content_tag('thead') do
+        @view.content_tag('tr') do
+          @view.safe_join(@description.columns.map { |column|
+            @view.content_tag('th', column.render_header)
+          })
         end
+      end
+    end
+
+    def render_table_body
+      @view.content_tag('tbody') do
+        render_rows
       end
     end
 
     def render_rows
       @view.safe_join(@collection.map { |datum|
-        @view.content_tag('tr', '') do
+        @view.content_tag('tr') do
           render_cells(datum)
         end
       })
