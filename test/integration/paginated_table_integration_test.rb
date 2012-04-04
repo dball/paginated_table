@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'capybara/webkit'
 
 describe "paginated_table integration" do
 
@@ -25,6 +26,14 @@ describe "paginated_table integration" do
       (1..10).each do |row|
         page.has_xpath?("#{tr_xpath(row)}/td[2]/a[@href='/data/#{row}'][.='#{row}']").must_equal true
       end
+    end
+  end
+
+  describe "javascript spike" do
+    it "renders to the console" do
+      Capybara.current_driver = Capybara.javascript_driver
+      visit "/data"
+      page.driver.console_messages.map { |m| m[:message] }.must_equal %w(foobar)
     end
   end
 
