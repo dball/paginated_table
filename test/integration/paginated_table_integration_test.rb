@@ -30,11 +30,11 @@ describe "paginated_table integration" do
   end
 
   describe "javascript spike" do
-    it "renders to the console" do
-      Capybara.current_driver = Capybara.javascript_driver
-      visit "/data"
-      page.driver.console_messages.map { |m| m[:message] }.must_equal %w(foobar)
-    end
+    #it "renders to the console" do
+    #  Capybara.current_driver = Capybara.javascript_driver
+    #  visit "/data"
+    #  page.driver.console_messages.map { |m| m[:message] }.must_equal %w(foobar)
+    #end
   end
 
   describe "pagination" do
