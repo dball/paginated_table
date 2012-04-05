@@ -7,66 +7,78 @@ module PaginatedTable
       view.send(:extend, ViewHelpers)
       view
     }
-    let(:collection) { stub("collection") }
-    let(:results) { stub("results") }
 
     describe "#paginated_table" do
-      it "delegates to Handler with the default arguments" do
-        Handler.expects(:handle).
-          with(view, TableDescription, RendersTable, collection).
-          returns(results)
-        view.paginated_table(collection).must_equal results
-      end
-
-      it "accepts a :describer option" do
-        describer_class = stub("describer")
-        Handler.expects(:handle).
-          with(view, describer_class, RendersTable, collection).
-          returns(results)
-        view.paginated_table(collection, :describer => describer_class).must_equal results
-      end
-
-      it "accepts a :renderer option" do
-        renderer_class = stub("renderer")
-        Handler.expects(:handle).
-          with(view, TableDescription, renderer_class, collection).
-          returns(results)
-        view.paginated_table(collection, :renderer => renderer_class).must_equal results
+      it "constructs a ViewHelper and calls render on it" do
+        collection = stub("collection")
+        options = stub("options")
+        helper = stub("helper")
+        block = lambda {}
+        ViewHelper.stubs(:new).with(view, collection, options, block).returns(helper)
+        results = stub("results")
+        helper.stubs(:render).returns(results)
+        view.paginated_table(collection, options, &block).must_equal results
       end
     end
   end
 
-  describe Handler do
-    describe ".handle" do
-      let(:view) { stub("view") }
-      let(:collection) { stub("collection") }
-      let(:describer_class) { stub("describer", :new => description) }
-      let(:renderer_class) { stub("renderer", :new => renderer) }
-      let(:description) { stub("description") }
-      let(:renderer) { stub("renderer", :render => results) }
-      let(:results) { stub("results") }
+  describe ViewHelper do
+    let(:view) { stub("view") }
+    let(:collection) { stub("collection") }
+    let(:description_proc) { stub("description_proc", :call => nil) }
 
-      it "constructs a new description" do
-        describer_class.expects(:new).with().returns(description)
-        Handler.handle(view, describer_class, renderer_class, collection) { |b| }
+    describe "#render" do
+      it "calls render on the table renderer" do
+        results = stub("results")
+        RendersTable.any_instance.stubs(:render).returns(results)
+        helper = ViewHelper.new(view, collection, {}, description_proc)
+        helper.render.must_equal results
+      end
+    end
+
+    describe "#table_description" do
+      it "creates a new description with the description proc" do
+        helper = ViewHelper.new(view, collection, {}, description_proc)
+        TableDescription.expects(:new).with(description_proc)
+        helper.table_description
+      end
+    end
+
+    describe "#table_renderer" do
+      it "constructs a new table renderer with the view, description, and collection" do
+        helper = ViewHelper.new(view, collection, {}, description_proc)
+        description = stub("description")
+        helper.stubs(:table_description).returns(description)
+        RendersTable.expects(:new).with(view, description, collection)
+        helper.table_renderer
+      end
+    end
+
+    describe "#table_renderer_class" do
+      it "defaults to RendersTable" do
+        helper = ViewHelper.new(view, collection, {}, description_proc)
+        helper.table_renderer_class.must_equal RendersTable
       end
 
-      it "yields the description once to its block" do
-        yielded_args = []
-        Handler.handle(view, describer_class, renderer_class, collection) do |block_arg|
-          yielded_args << block_arg
-        end
-        yielded_args.must_equal [description]
+      it "accepts a :table_renderer option" do
+        table_renderer_class = stub("table_renderer_class")
+        options = { :table_renderer => table_renderer_class }
+        helper = ViewHelper.new(view, collection, options, description_proc)
+        helper.table_renderer_class.must_equal table_renderer_class
+      end
+    end
+
+    describe "#table_describer_class" do
+      it "defaults to TableDescription" do
+        helper = ViewHelper.new(view, collection, {}, description_proc)
+        helper.table_describer_class.must_equal TableDescription
       end
 
-      it "constructs a new renderer with the view, description, and collection" do
-        renderer_class.expects(:new).with(view, description, collection).returns(renderer)
-        Handler.handle(view, describer_class, renderer_class, collection) { |b| }
-      end
-
-      it "returns the results of calling render on the renderer" do
-        Handler.handle(view, describer_class, renderer_class, collection) { |b| }.
-          must_equal results
+      it "accepts a :describer option" do
+        table_describer_class = stub("table_describer_class")
+        options = { :describer => table_describer_class }
+        helper = ViewHelper.new(view, collection, options, description_proc)
+        helper.table_describer_class.must_equal table_describer_class
       end
     end
   end
@@ -75,6 +87,12 @@ module PaginatedTable
     describe "#initialize" do
       it "creates a new instance with empty columns" do
         TableDescription.new.columns.must_equal []
+      end
+
+      it "calls the given block with itself" do
+        fake_proc = stub("proc")
+        fake_proc.expects(:call)
+        TableDescription.new(fake_proc)
       end
     end
 

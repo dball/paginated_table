@@ -1,26 +1,45 @@
 module PaginatedTable
   module ViewHelpers
     def paginated_table(collection, options = {}, &block)
-      describer_class = options.fetch(:describer, TableDescription)
-      renderer_class = options.fetch(:renderer, RendersTable)
-      Handler.handle(self, describer_class, renderer_class, collection, &block)
+      ViewHelper.new(self, collection, options, block).render
     end
   end
 
-  class Handler
-    def self.handle(view, describer_class, renderer_class, collection)
-      description = describer_class.new
-      yield description
-      renderer = renderer_class.new(view, description, collection)
-      renderer.render
+  class ViewHelper
+    def initialize(view, collection, options, description_proc)
+      @view = view
+      @collection = collection
+      @options = options
+      @description_proc = description_proc
+    end
+
+    def render
+      table_renderer.render
+    end
+
+    def table_description
+      table_describer_class.new(@description_proc)
+    end
+
+    def table_renderer
+      table_renderer_class.new(@view, table_description, @collection)
+    end
+
+    def table_renderer_class
+      @options.fetch(:table_renderer, RendersTable)
+    end
+
+    def table_describer_class
+      @options.fetch(:describer, TableDescription)
     end
   end
 
   class TableDescription
     attr_reader :columns
 
-    def initialize
+    def initialize(description_proc = nil)
       @columns = []
+      description_proc.call(self) if description_proc
     end
 
     def column(*args, &block)
