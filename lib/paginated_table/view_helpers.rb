@@ -22,7 +22,11 @@ module PaginatedTable
     end
 
     def table_renderer
-      table_renderer_class.new(@view, table_description, @collection)
+      table_renderer_class.new(@view, table_description, @collection, link_renderer)
+    end
+
+    def link_renderer
+      link_renderer_class.new(@view)
     end
 
     def table_renderer_class
@@ -31,6 +35,10 @@ module PaginatedTable
 
     def table_describer_class
       @options.fetch(:describer, TableDescription)
+    end
+
+    def link_renderer_class
+      @options.fetch(:link_renderer, LinkRenderer)
     end
   end
 
@@ -67,10 +75,11 @@ module PaginatedTable
   end
 
   class RendersTable
-    def initialize(view, description, collection)
+    def initialize(view, description, collection, link_renderer)
       @view = view
       @description = description
       @collection = collection
+      @link_renderer = link_renderer
     end
 
     def render
@@ -90,7 +99,7 @@ module PaginatedTable
     end
 
     def render_pagination_links
-      content = @view.will_paginate(@collection)
+      content = @view.will_paginate(@collection, :renderer => @link_renderer)
       @view.content_tag('div', content, :class => 'links')
     end
 
@@ -130,6 +139,21 @@ module PaginatedTable
 
     def render_table_body_cell(datum, column)
       @view.content_tag('td', column.render_cell(datum))
+    end
+  end
+
+  class LinkRenderer < WillPaginate::ActionView::LinkRenderer
+    def initialize(view)
+      super()
+      @view = view
+    end
+
+    def tag(name, value, attributes = {})
+      if name == :a
+        @view.link_to(value, attributes.delete(:href), attributes.merge(:remote => true))
+      else
+        super
+      end
     end
   end
 end

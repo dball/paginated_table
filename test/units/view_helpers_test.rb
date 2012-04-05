@@ -45,11 +45,20 @@ module PaginatedTable
     end
 
     describe "#table_renderer" do
-      it "constructs a new table renderer with the view, description, and collection" do
+      it "constructs a new table renderer with the view, description, collection, and link renderer" do
         description = stub("description")
         helper.stubs(:table_description).returns(description)
-        RendersTable.expects(:new).with(view, description, collection)
+        link_renderer = stub("link_renderer")
+        helper.stubs(:link_renderer).returns(link_renderer)
+        RendersTable.expects(:new).with(view, description, collection, link_renderer)
         helper.table_renderer
+      end
+    end
+
+    describe "#link_renderer" do
+      it "constructs a new link renderer with the view" do
+        LinkRenderer.expects(:new).with(view)
+        helper.link_renderer
       end
     end
 
@@ -74,6 +83,18 @@ module PaginatedTable
         table_describer_class = stub("table_describer_class")
         options[:describer] = table_describer_class
         helper.table_describer_class.must_equal table_describer_class
+      end
+    end
+
+    describe "#link_renderer_class" do
+      it "defaults to LinkRenderer" do
+        helper.link_renderer_class.must_equal LinkRenderer
+      end
+
+      it "accepts a :link_renderer option" do
+        link_renderer_class = stub("link_renderer_class")
+        options[:link_renderer] = link_renderer_class
+        helper.link_renderer_class.must_equal link_renderer_class
       end
     end
   end
@@ -139,15 +160,46 @@ module PaginatedTable
     end
   end
 
+  describe LinkRenderer do
+    let(:view) { stub("view") }
+    let(:renderer) { LinkRenderer.new(view) }
+
+    describe "#initialize" do
+      it "creates a new instance with the view" do
+        renderer
+      end
+    end
+
+    describe "#tag" do
+      it "calls link_to on the view with the :remote option for :a tags" do
+        results = stub("results")
+        text = stub("text")
+        href = stub("href")
+        view.expects(:link_to).
+          with(text, href, { :class => 'highlight', :remote => true }).
+          returns(results)
+        renderer.tag(:a, text, :class => 'highlight', :href => href).must_equal results
+      end
+
+      it "delegates to its parent for all other tags" do
+        view.expects(:link_to).never
+        renderer.tag(:span, "foo")
+      end
+    end
+
+  end
+
   describe RendersTable do
     let(:view) { stub("view") }
     let(:description) { stub("description") }
+    # FLAG
     let(:collection) { stub("collection") }
-    let(:table) { RendersTable.new(view, description, collection) }
+    let(:link_renderer) { stub("link_renderer") }
+    let(:table) { RendersTable.new(view, description, collection, link_renderer) }
 
     describe "#initialize" do
       it "creates a new instance with the view, description, and collection" do
-        RendersTable.new(view, description, collection)
+        table
       end
     end
 
@@ -179,7 +231,9 @@ module PaginatedTable
 
     describe "#render_pagination_links" do
       it "makes a div.links with the will_paginate links from will_paginate" do
-        view.stubs(:will_paginate).with(collection).returns("<links/>")
+        view.stubs(:will_paginate).
+          with(collection, :renderer => link_renderer).
+          returns("<links/>")
         view.expects(:content_tag).with('div', "<links/>", :class => 'links')
         table.render_pagination_links
       end
@@ -224,7 +278,7 @@ module PaginatedTable
     describe "#render_table_body" do
       it "makes a tbody with the table body rows" do
         data = [stub("datum1"), stub("datum2")]
-        table = RendersTable.new(view, description, data)
+        table = RendersTable.new(view, description, data, link_renderer)
         table.stubs(:render_table_body_row).with(data.first).returns("<row1/>")
         table.stubs(:render_table_body_row).with(data.last).returns("<row2/>")
         view.expects(:content_tag).with('tbody', "<row1/><row2/>")
