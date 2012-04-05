@@ -55,7 +55,21 @@ module PaginatedTable
     end
 
     def render
-      render_table
+      pagination_info = render_pagination_info
+      @view.content_tag('div', :class => 'pagination') do
+        pagination_info + render_table + pagination_info
+      end
+    end
+
+    def render_pagination_info
+      @view.content_tag('div', :class => 'header') do
+        @view.content_tag('div', :class => 'info') do
+          @view.page_entries_info(@collection)
+        end +
+        @view.content_tag('div', :class => 'links') do
+          @view.will_paginate(@collection)
+        end
+      end
     end
 
     def render_table
