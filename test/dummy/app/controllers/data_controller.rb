@@ -10,10 +10,10 @@ class DataController < ApplicationController
   DEFAULT_PARAMS = {
     :page => 1,
     :per_page => 10
-  }
+  }.with_indifferent_access
 
   def index
-    requested_pagination_params = params.fetch(:paginated_table, {})
+    requested_pagination_params = params.slice(:page)
     pagination_params = DEFAULT_PARAMS.merge(requested_pagination_params)
     @data = DATA.paginate(pagination_params)
   end
