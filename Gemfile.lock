@@ -62,8 +62,11 @@ GEM
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    metaclass (0.0.1)
     mime-types (1.18)
     minitest (2.12.0)
+    mocha (0.10.5)
+      metaclass (~> 0.0.1)
     multi_json (1.2.0)
     nokogiri (1.5.2)
     polyglot (0.3.3)
@@ -121,5 +124,6 @@ DEPENDENCIES
   capybara-webkit
   jquery-rails
   minitest
+  mocha
   paginated_table!
   sqlite3

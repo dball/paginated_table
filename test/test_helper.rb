@@ -5,6 +5,7 @@ require File.expand_path("../dummy/config/environment.rb",  __FILE__)
 require "rails/test_help"
 require 'minitest/autorun'
 require 'capybara/rails'
+require 'mocha/integration/mini_test'
 
 Rails.backtrace_cleaner.remove_silencers!
 

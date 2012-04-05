@@ -1,11 +1,17 @@
 module PaginatedTable
   module ViewHelpers
-    def paginated_table(collection, options = {})
+    def paginated_table(collection, options = {}, &block)
       describer_class = options.fetch(:describer, TableDescription)
       renderer_class = options.fetch(:renderer, RendersTable)
+      Handler.handle(self, describer_class, renderer_class, collection, &block)
+    end
+  end
+
+  class Handler
+    def self.handle(view, describer_class, renderer_class, collection)
       description = describer_class.new
       yield description
-      renderer = renderer_class.new(self, description, collection)
+      renderer = renderer_class.new(view, description, collection)
       renderer.render
     end
   end
@@ -17,8 +23,8 @@ module PaginatedTable
       @columns = []
     end
 
-    def column(name, &block)
-      @columns << Column.new(name, &block)
+    def column(*args, &block)
+      @columns << Column.new(*args, &block)
     end
 
     class Column
