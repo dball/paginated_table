@@ -55,61 +55,62 @@ module PaginatedTable
     end
 
     def render
-      pagination_info = render_pagination_info
-      @view.content_tag('div', :class => 'pagination') do
-        pagination_info + render_table + pagination_info
-      end
+      pagination_area = render_pagination_area
+      content = pagination_area + render_table + pagination_area
+      @view.content_tag('div', content, :class => 'pagination')
+    end
+
+    def render_pagination_area
+      content = render_pagination_info + render_pagination_links
+      @view.content_tag('div', content, :class => 'header')
     end
 
     def render_pagination_info
-      @view.content_tag('div', :class => 'header') do
-        @view.content_tag('div', :class => 'info') do
-          @view.page_entries_info(@collection)
-        end +
-        @view.content_tag('div', :class => 'links') do
-          @view.will_paginate(@collection)
-        end
-      end
+      content = @view.page_entries_info(@collection)
+      @view.content_tag('div', content, :class => 'info')
+    end
+
+    def render_pagination_links
+      content = @view.will_paginate(@collection)
+      @view.content_tag('div', content, :class => 'links')
     end
 
     def render_table
-      @view.content_tag('table', :class => 'paginated') do
-        render_table_header + render_table_body
-      end
+      content = render_table_header + render_table_body
+      @view.content_tag('table', content, :class => 'paginated')
     end
 
     def render_table_header
-      @view.content_tag('thead') do
-        @view.content_tag('tr') do
-          @view.safe_join(@description.columns.map { |column|
-            @view.content_tag('th', column.render_header)
-          })
-        end
-      end
+      @view.content_tag('thead', render_table_header_row)
+    end
+
+    def render_table_header_row
+      content = @description.columns.map { |column|
+        render_table_header_column(column)
+      }.reduce(&:+)
+      @view.content_tag('tr', content)
+    end
+
+    def render_table_header_column(column)
+      @view.content_tag('th', column.render_header)
     end
 
     def render_table_body
-      @view.content_tag('tbody') do
-        render_rows
-      end
+      content = @collection.map { |datum|
+        render_table_body_row(datum)
+      }.reduce(&:+)
+      @view.content_tag('tbody', content)
     end
 
-    def render_rows
-      @view.safe_join(@collection.map { |datum|
-        @view.content_tag('tr') do
-          render_cells(datum)
-        end
-      })
+    def render_table_body_row(datum)
+      content = @description.columns.map { |column|
+        render_table_body_cell(datum, column)
+      }.reduce(&:+)
+      @view.content_tag('tr', content)
     end
 
-    def render_cells(datum)
-      @view.safe_join(@description.columns.map { |column|
-        @view.content_tag('td', render_cell_content(column, datum))
-      })
-    end
-
-    def render_cell_content(column, datum)
-      column.render_cell(datum)
+    def render_table_body_cell(datum, column)
+      @view.content_tag('td', column.render_cell(datum))
     end
   end
 end
