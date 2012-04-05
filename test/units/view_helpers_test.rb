@@ -125,4 +125,120 @@ module PaginatedTable
       end
     end
   end
+
+  describe RendersTable do
+    let(:view) { stub("view") }
+    let(:description) { stub("description") }
+    let(:collection) { stub("collection") }
+    let(:table) { RendersTable.new(view, description, collection) }
+
+    describe "#initialize" do
+      it "creates a new instance with the view, description, and collection" do
+        RendersTable.new(view, description, collection)
+      end
+    end
+
+    describe "#render" do
+      it "makes a div.pagination with the table and a pagination header and footer" do
+        table.stubs(:render_pagination_area).returns("<pagination/>")
+        table.stubs(:render_table).returns("<table/>")
+        view.expects(:content_tag).with('div', "<pagination/><table/><pagination/>", :class => 'pagination')
+        table.render
+      end
+    end
+
+    describe "#render_pagination_area" do
+      it "makes a div.header with the pagination info and links" do
+        table.stubs(:render_pagination_info).returns("<info/>")
+        table.stubs(:render_pagination_links).returns("<links/>")
+        view.expects(:content_tag).with('div', "<info/><links/>", :class => 'header')
+        table.render_pagination_area
+      end
+    end
+
+    describe "#render_pagination_info" do
+      it "makes a div.info with the page_entries_info from will_paginate" do
+        view.stubs(:page_entries_info).with(collection).returns("<info/>")
+        view.expects(:content_tag).with('div', "<info/>", :class => 'info')
+        table.render_pagination_info
+      end
+    end
+
+    describe "#render_pagination_links" do
+      it "makes a div.links with the will_paginate links from will_paginate" do
+        view.stubs(:will_paginate).with(collection).returns("<links/>")
+        view.expects(:content_tag).with('div', "<links/>", :class => 'links')
+        table.render_pagination_links
+      end
+    end
+
+    describe "#render_table" do
+      it "makes a table.paginated with the table header and body" do
+        table.stubs(:render_table_header).returns("<header/>")
+        table.stubs(:render_table_body).returns("<body/>")
+        view.expects(:content_tag).with('table', "<header/><body/>", :class => 'paginated')
+        table.render_table
+      end
+    end
+
+    describe "#render_table_header" do
+      it "makes a thead with the table header row" do
+        table.stubs(:render_table_header_row).returns("<header/>")
+        view.expects(:content_tag).with('thead', "<header/>")
+        table.render_table_header
+      end
+    end
+
+    describe "#render_table_header_row" do
+      it "makes a tr with the table header columns" do
+        columns = [stub("column1"), stub("column2")]
+        description.stubs(:columns).returns(columns)
+        table.stubs(:render_table_header_column).with(columns.first).returns("<col1/>")
+        table.stubs(:render_table_header_column).with(columns.last).returns("<col2/>")
+        view.expects(:content_tag).with('tr', "<col1/><col2/>")
+        table.render_table_header_row
+      end
+    end
+
+    describe "#render_table_header_column" do
+      it "makes a th with the render_header from the column" do
+        column = stub("column", :render_header => '<header/>')
+        view.expects(:content_tag).with('th', "<header/>")
+        table.render_table_header_column(column)
+      end
+    end
+
+    describe "#render_table_body" do
+      it "makes a tbody with the table body rows" do
+        data = [stub("datum1"), stub("datum2")]
+        table = RendersTable.new(view, description, data)
+        table.stubs(:render_table_body_row).with(data.first).returns("<row1/>")
+        table.stubs(:render_table_body_row).with(data.last).returns("<row2/>")
+        view.expects(:content_tag).with('tbody', "<row1/><row2/>")
+        table.render_table_body
+      end
+    end
+
+    describe "#render_table_body_row" do
+      it "makes a tr with the table body cells" do
+        datum = stub("datum")
+        columns = [stub("column1"), stub("column2")]
+        description.stubs(:columns).returns(columns)
+        table.stubs(:render_table_body_cell).with(datum, columns.first).returns("<cell1/>")
+        table.stubs(:render_table_body_cell).with(datum, columns.last).returns("<cell2/>")
+        view.expects(:content_tag).with('tr', "<cell1/><cell2/>")
+        table.render_table_body_row(datum)
+      end
+    end
+
+    describe "#render_table_body_cell" do
+      it "makes a td with the render_cell from the column" do
+        datum = stub("datum")
+        column = stub("column")
+        column.stubs(:render_cell).with(datum).returns("<datum/>")
+        view.expects(:content_tag).with('td', "<datum/>")
+        table.render_table_body_cell(datum, column)
+      end
+    end
+  end
 end
