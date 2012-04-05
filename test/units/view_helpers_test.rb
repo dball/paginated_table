@@ -26,19 +26,19 @@ module PaginatedTable
     let(:view) { stub("view") }
     let(:collection) { stub("collection") }
     let(:description_proc) { stub("description_proc", :call => nil) }
+    let(:options) { {} }
+    let(:helper){ ViewHelper.new(view, collection, options, description_proc) }
 
     describe "#render" do
       it "calls render on the table renderer" do
         results = stub("results")
         RendersTable.any_instance.stubs(:render).returns(results)
-        helper = ViewHelper.new(view, collection, {}, description_proc)
         helper.render.must_equal results
       end
     end
 
     describe "#table_description" do
       it "creates a new description with the description proc" do
-        helper = ViewHelper.new(view, collection, {}, description_proc)
         TableDescription.expects(:new).with(description_proc)
         helper.table_description
       end
@@ -46,7 +46,6 @@ module PaginatedTable
 
     describe "#table_renderer" do
       it "constructs a new table renderer with the view, description, and collection" do
-        helper = ViewHelper.new(view, collection, {}, description_proc)
         description = stub("description")
         helper.stubs(:table_description).returns(description)
         RendersTable.expects(:new).with(view, description, collection)
@@ -56,28 +55,24 @@ module PaginatedTable
 
     describe "#table_renderer_class" do
       it "defaults to RendersTable" do
-        helper = ViewHelper.new(view, collection, {}, description_proc)
         helper.table_renderer_class.must_equal RendersTable
       end
 
       it "accepts a :table_renderer option" do
         table_renderer_class = stub("table_renderer_class")
-        options = { :table_renderer => table_renderer_class }
-        helper = ViewHelper.new(view, collection, options, description_proc)
+        options[:table_renderer] = table_renderer_class
         helper.table_renderer_class.must_equal table_renderer_class
       end
     end
 
     describe "#table_describer_class" do
       it "defaults to TableDescription" do
-        helper = ViewHelper.new(view, collection, {}, description_proc)
         helper.table_describer_class.must_equal TableDescription
       end
 
       it "accepts a :describer option" do
         table_describer_class = stub("table_describer_class")
-        options = { :describer => table_describer_class }
-        helper = ViewHelper.new(view, collection, options, description_proc)
+        options[:describer] = table_describer_class
         helper.table_describer_class.must_equal table_describer_class
       end
     end
