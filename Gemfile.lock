@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     paginated_table (0.0.1)
+      jquery-rails
       rails (~> 3.2)
       will_paginate (~> 3.0)
 
