@@ -33,24 +33,47 @@ describe "paginated_table integration" do
     end
   end
 
-  describe "javascript spike" do
-    #it "displays to the console" do
-    #  Capybara.current_driver = Capybara.javascript_driver
-    #  visit "/data"
-    #  page.driver.console_messages.map { |m| m[:message] }.must_equal %w(foobar)
-    #end
-  end
-
   describe "pagination" do
-    it "displays one page of results" do
-      visit "/data"
-      pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 100 in total"
+    describe "without javascript" do
+      it "displays one page of results" do
+        visit "/data"
+        pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 100 in total"
+      end
+
+      it "follows the link to the second page of results" do
+        visit "/data"
+        click_link "2"
+        pagination_info_text.must_equal "Displaying data controller/data 11 - 20 of 100 in total"
+      end
     end
 
-    it "follows the link to the second page of results" do
-      visit "/data"
-      click_link "2"
-      pagination_info_text.must_equal "Displaying data controller/data 11 - 20 of 100 in total"
+    describe "with javascript" do
+      before do
+        Capybara.current_driver = Capybara.javascript_driver
+      end
+
+      it "displays one page of results" do
+        visit "/data"
+        pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 100 in total"
+      end
+
+      it "follows the link to the second page of results" do
+        visit "/data"
+        click_link "2"
+        wait_for_ajax_request
+        pagination_info_text.must_equal "Displaying data controller/data 11 - 20 of 100 in total"
+      end
+
+      # Ensures the AJAX content is decorated with event handlers
+      it "follows the link to the fourth page, then back to the third page" do
+        visit "/data"
+        click_link "4"
+        wait_for_ajax_request
+        pagination_info_text.must_equal "Displaying data controller/data 31 - 40 of 100 in total"
+        click_link "3"
+        wait_for_ajax_request
+        pagination_info_text.must_equal "Displaying data controller/data 21 - 30 of 100 in total"
+      end
     end
   end
 
@@ -92,6 +115,12 @@ describe "paginated_table integration" do
       str.force_encoding('UTF-8').gsub(/\xc2\xa0/u, ' ')
     else
       str.gsub(/\xc2\xa0/u, ' ')
+    end
+  end
+
+  def wait_for_ajax_request
+    wait_until do
+      page.evaluate_script('jQuery.active') == 0
     end
   end
 end

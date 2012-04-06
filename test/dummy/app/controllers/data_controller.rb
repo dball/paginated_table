@@ -16,5 +16,6 @@ class DataController < ApplicationController
     requested_pagination_params = params.slice(:page)
     pagination_params = DEFAULT_PARAMS.merge(requested_pagination_params)
     @data = DATA.paginate(pagination_params)
+    render :layout => false if request.xhr?
   end
 end
