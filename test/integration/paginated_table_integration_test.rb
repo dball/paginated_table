@@ -77,6 +77,78 @@ describe "paginated_table integration" do
     end
   end
 
+  describe "sorting" do
+    describe "without javascript" do
+      it "follows the link to sort the first column in ascending order" do
+        visit "/data"
+        click_link "Name"
+        [1, 10, 100, 11, 12, 13, 14, 15, 16, 17].each_with_index do |row, i|
+          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
+        end
+      end
+
+      it "follows the link to sort the first column twice in descending order" do
+        visit "/data"
+        click_link "Name"
+        click_link "Name"
+        [99, 98, 97, 96, 95, 94, 93, 92, 91, 90].each_with_index do |row, i|
+          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
+        end
+      end
+
+      it "follows the link to sort the first column, then to the second page" do
+        visit "/data"
+        click_link "Name"
+        click_link "2"
+        [18, 19, 2, 20, 21, 22, 23, 24, 25, 26].each_with_index do |row, i|
+          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
+        end
+      end
+
+      it "has no link to sort the second column" do
+        visit "/data"
+        page.has_xpath?("a[.='Link']").must_equal false
+      end
+    end
+
+    describe "with javascript" do
+      before do
+        Capybara.current_driver = Capybara.javascript_driver
+      end
+
+      it "follows the link to sort the first column in ascending order" do
+        visit "/data"
+        click_link "Name"
+        wait_for_ajax_request
+        [1, 10, 100, 11, 12, 13, 14, 15, 16, 17].each_with_index do |row, i|
+          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
+        end
+      end
+
+      it "follows the link to sort the first column twice in descending order" do
+        visit "/data"
+        click_link "Name"
+        wait_for_ajax_request
+        click_link "Name"
+        wait_for_ajax_request
+        [99, 98, 97, 96, 95, 94, 93, 92, 91, 90].each_with_index do |row, i|
+          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
+        end
+      end
+
+      it "follows the link to sort the first column, then to the second page" do
+        visit "/data"
+        click_link "Name"
+        wait_for_ajax_request
+        click_link "2"
+        wait_for_ajax_request
+        [18, 19, 2, 20, 21, 22, 23, 24, 25, 26].each_with_index do |row, i|
+          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
+        end
+      end
+    end
+  end
+
   def pagination_xpath
     "//div[@class='pagination']"
   end

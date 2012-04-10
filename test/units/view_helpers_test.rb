@@ -2,99 +2,30 @@ require 'test_helper'
 
 module PaginatedTable
   describe ViewHelpers do
+    let(:params) { stub("params") }
     let(:view) {
       view = Object.new
       view.send(:extend, ViewHelpers)
+      view.stubs("params" => params)
       view
     }
+    let(:collection) { stub("collection") }
+    let(:description_block) { lambda {} }
 
     describe "#paginated_table" do
-      it "constructs a ViewHelper and calls render on it" do
-        collection = stub("collection")
-        options = stub("options")
-        helper = stub("helper")
-        block = lambda {}
-        ViewHelper.stubs(:new).with(view, collection, options, block).returns(helper)
-        results = stub("results")
-        helper.stubs(:render).returns(results)
-        view.paginated_table(collection, options, &block).must_equal results
-      end
-    end
-  end
-
-  describe ViewHelper do
-    let(:view) { stub("view") }
-    let(:collection) { stub("collection") }
-    let(:description_proc) { stub("description_proc", :call => nil) }
-    let(:options) { {} }
-    let(:helper){ ViewHelper.new(view, collection, options, description_proc) }
-
-    describe "#render" do
-      it "calls render on the table renderer" do
-        results = stub("results")
-        RendersTable.any_instance.stubs(:render).returns(results)
-        helper.render.must_equal results
-      end
-    end
-
-    describe "#table_description" do
-      it "creates a new description with the description proc" do
-        TableDescription.expects(:new).with(description_proc)
-        helper.table_description
-      end
-    end
-
-    describe "#table_renderer" do
-      it "constructs a new table renderer with the view, description, collection, and link renderer" do
-        description = stub("description")
-        helper.stubs(:table_description).returns(description)
+      it "renders a table" do
+        table_description = stub("table_description")
+        TableDescription.stubs("new").with(description_block).returns(table_description)
+        page = stub("page")
+        PageParams.stubs("create_page_from_params").with(params).returns(page)
         link_renderer = stub("link_renderer")
-        helper.stubs(:link_renderer).returns(link_renderer)
-        RendersTable.expects(:new).with(view, description, collection, link_renderer)
-        helper.table_renderer
-      end
-    end
-
-    describe "#link_renderer" do
-      it "constructs a new link renderer with the view" do
-        LinkRenderer.expects(:new).with(view)
-        helper.link_renderer
-      end
-    end
-
-    describe "#table_renderer_class" do
-      it "defaults to RendersTable" do
-        helper.table_renderer_class.must_equal RendersTable
-      end
-
-      it "accepts a :table_renderer option" do
-        table_renderer_class = stub("table_renderer_class")
-        options[:table_renderer] = table_renderer_class
-        helper.table_renderer_class.must_equal table_renderer_class
-      end
-    end
-
-    describe "#table_describer_class" do
-      it "defaults to TableDescription" do
-        helper.table_describer_class.must_equal TableDescription
-      end
-
-      it "accepts a :describer option" do
-        table_describer_class = stub("table_describer_class")
-        options[:describer] = table_describer_class
-        helper.table_describer_class.must_equal table_describer_class
-      end
-    end
-
-    describe "#link_renderer_class" do
-      it "defaults to LinkRenderer" do
-        helper.link_renderer_class.must_equal LinkRenderer
-      end
-
-      it "accepts a :link_renderer option" do
-        link_renderer_class = stub("link_renderer_class")
-        options[:link_renderer] = link_renderer_class
-        helper.link_renderer_class.must_equal link_renderer_class
+        LinkRenderer.stubs("new").with(page).returns(link_renderer)
+        table_renderer = stub("table_renderer")
+        RendersTable.stubs("new").
+          with(view, table_description, collection, link_renderer).
+          returns(table_renderer)
+        table_renderer.expects("render")
+        view.paginated_table(collection, &description_block)
       end
     end
   end
@@ -127,6 +58,20 @@ module PaginatedTable
     describe "#initialize" do
       it "creates a new instance with a name and an optional block" do
         TableDescription::Column.new(:foo) { true }
+      end
+
+      it "accepts an options hash" do
+        TableDescription::Column.new(:foo, :baz => 'bat')
+      end
+    end
+
+    describe "#sortable?" do
+      it "returns true by default" do
+        TableDescription::Column.new(:foo).sortable?.must_equal true
+      end
+
+      it "returns false if the :sortable option is false" do
+        TableDescription::Column.new(:foo, :sortable => false).sortable?.must_equal false
       end
     end
 
@@ -161,24 +106,36 @@ module PaginatedTable
   end
 
   describe LinkRenderer do
+    let(:page) { Page.new(:number => 2, :rows => 5, :sort_column => 'to_s', :sort_direction => 'desc') }
+    let(:collection) { (1..10).to_a }
+    let(:data_page) { collection.paginate(:page => 2, :per_page => 5) }
     let(:view) { stub("view") }
-    let(:renderer) { LinkRenderer.new(view) }
+    let(:renderer) do
+      renderer = LinkRenderer.new(page)
+      renderer.prepare(collection, {}, view)
+      renderer
+    end
+    let(:text) { stub("text") }
+    let(:href) { stub("href") }
+    let(:link) { stub("link") }
 
-    describe "#initialize" do
-      it "creates a new instance with the view" do
-        renderer
+
+    describe "#sort_link" do
+      it "calls link_to on the view with the sort url and the :remote option" do
+        view.stubs("url_for").
+          with(:sort_direction => 'asc', :per_page => '5', :page => '1', :sort_column => 'to_s').
+          returns(href)
+        view.stubs("link_to").with(text, href, :remote => true).returns(link)
+        renderer.sort_link(text, 'to_s').must_equal link
       end
     end
 
     describe "#tag" do
       it "calls link_to on the view with the :remote option for :a tags" do
-        results = stub("results")
-        text = stub("text")
-        href = stub("href")
         view.expects(:link_to).
           with(text, href, { :class => 'highlight', :remote => true }).
-          returns(results)
-        renderer.tag(:a, text, :class => 'highlight', :href => href).must_equal results
+          returns(link)
+        renderer.tag(:a, text, :class => 'highlight', :href => href).must_equal link
       end
 
       it "delegates to its parent for all other tags" do
@@ -192,7 +149,6 @@ module PaginatedTable
   describe RendersTable do
     let(:view) { stub("view") }
     let(:description) { stub("description") }
-    # FLAG
     let(:collection) { stub("collection") }
     let(:link_renderer) { stub("link_renderer") }
     let(:table) { RendersTable.new(view, description, collection, link_renderer) }
@@ -269,9 +225,30 @@ module PaginatedTable
 
     describe "#render_table_header_column" do
       it "makes a th with the render_header from the column" do
-        column = stub("column", :render_header => '<header/>')
+        column = stub("column")
+        table.stubs(:render_table_header_column_content).with(column).returns("<header/>")
         view.expects(:content_tag).with('th', "<header/>")
         table.render_table_header_column(column)
+      end
+    end
+
+    describe "#render_table_header_column_content" do
+      describe "with a sortable column" do
+        let(:column) { stub("column", :name => :foo, :render_header => '<header/>', :sortable? => true) }
+
+        it "asks the link renderer to render a link to sort the column" do
+          result = stub("result")
+          link_renderer.stubs(:sort_link).with("<header/>", 'foo').returns(result)
+          table.render_table_header_column_content(column).must_equal result
+        end
+      end
+
+      describe "with an unsortable column" do
+        let(:column) { stub("column", :render_header => '<header/>', :sortable? => false) }
+
+        it "simply renders the column's header" do
+          table.render_table_header_column_content(column).must_equal '<header/>'
+        end
       end
     end
 

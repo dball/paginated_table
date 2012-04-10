@@ -1,44 +1,11 @@
 module PaginatedTable
   module ViewHelpers
-    def paginated_table(collection, options = {}, &block)
-      ViewHelper.new(self, collection, options, block).render
-    end
-  end
-
-  class ViewHelper
-    def initialize(view, collection, options, description_proc)
-      @view = view
-      @collection = collection
-      @options = options
-      @description_proc = description_proc
-    end
-
-    def render
+    def paginated_table(collection, &block)
+      table_description = TableDescription.new(block)
+      page = PageParams.create_page_from_params(params)
+      link_renderer = LinkRenderer.new(page)
+      table_renderer = RendersTable.new(self, table_description, collection, link_renderer)
       table_renderer.render
-    end
-
-    def table_description
-      table_describer_class.new(@description_proc)
-    end
-
-    def table_renderer
-      table_renderer_class.new(@view, table_description, @collection, link_renderer)
-    end
-
-    def link_renderer
-      link_renderer_class.new(@view)
-    end
-
-    def table_renderer_class
-      @options.fetch(:table_renderer, RendersTable)
-    end
-
-    def table_describer_class
-      @options.fetch(:describer, TableDescription)
-    end
-
-    def link_renderer_class
-      @options.fetch(:link_renderer, LinkRenderer)
     end
   end
 
@@ -55,9 +22,12 @@ module PaginatedTable
     end
 
     class Column
-      def initialize(name, &block)
+      attr_reader :name
+
+      def initialize(name, options = {}, &block)
         @name = name
         @block = block
+        @options = options
       end
 
       def render_header
@@ -70,6 +40,10 @@ module PaginatedTable
         else
           datum.send(@name)
         end
+      end
+
+      def sortable?
+        @options.fetch(:sortable, true)
       end
     end
   end
@@ -120,7 +94,16 @@ module PaginatedTable
     end
 
     def render_table_header_column(column)
-      @view.content_tag('th', column.render_header)
+      @view.content_tag('th', render_table_header_column_content(column))
+    end
+
+    def render_table_header_column_content(column)
+      text = column.render_header
+      if column.sortable?
+        @link_renderer.sort_link(text, column.name.to_s)
+      else
+        text
+      end
     end
 
     def render_table_body
@@ -143,17 +126,32 @@ module PaginatedTable
   end
 
   class LinkRenderer < WillPaginate::ActionView::LinkRenderer
-    def initialize(view)
+    def initialize(page)
       super()
-      @view = view
+      @paginated_table_page = page
+    end
+
+    def sort_link(text, sort_on)
+      @template.link_to(text, sort_url(sort_on), :remote => true)
     end
 
     def tag(name, value, attributes = {})
       if name == :a
-        @view.link_to(value, attributes.delete(:href), attributes.merge(:remote => true))
+        @template.link_to(value, attributes.delete(:href), attributes.merge(:remote => true))
       else
         super
       end
+    end
+
+    private
+
+    def sort_url(sort_on)
+      new_page = @paginated_table_page.page_for_sort_column(sort_on)
+      @template.url_for(PageParams.to_params(new_page))
+    end
+
+    def default_url_params
+      PageParams.to_params(@paginated_table_page)
     end
   end
 end
