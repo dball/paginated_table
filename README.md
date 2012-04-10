@@ -63,6 +63,7 @@ and in `products.html.erb`:
           table.column :price do |price|
             format_currency(price)
           end
+          table.column :qty, :title => 'Quantity'
         end %>
 
 The `div.pagination` element on the page will be updated for successful
@@ -125,8 +126,6 @@ collection.
 ## TODO
 
 * AJAX links should be optional
-
-* Alternate column titles
 
 * AJAX busy indicator
 

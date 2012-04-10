@@ -79,6 +79,11 @@ module PaginatedTable
       it "returns the titleized name" do
         TableDescription::Column.new(:foo).render_header.must_equal "Foo"
       end
+
+      it "returns the :title option if given" do
+        TableDescription::Column.new(:foo, :title => 'bar').
+          render_header.must_equal "bar"
+      end
     end
 
     describe "#render_cell" do

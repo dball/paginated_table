@@ -20,6 +20,10 @@ describe "paginated_table integration" do
       page.has_xpath?("#{th_xpath(1)}[.='Name']").must_equal true
     end
 
+    it "displays Raw in the third column header" do
+      page.has_xpath?("#{th_xpath(3)}[.='Raw']").must_equal true
+    end
+
     it "displays the data names in the first column" do
       (1..10).each do |row|
         page.has_xpath?("#{tr_xpath(row)}/td[1][.='Name #{row}']").must_equal true

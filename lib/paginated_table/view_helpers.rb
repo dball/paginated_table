@@ -31,7 +31,7 @@ module PaginatedTable
       end
 
       def render_header
-        @name.to_s.titleize
+        @options.fetch(:title, @name.to_s.titleize)
       end
 
       def render_cell(datum)

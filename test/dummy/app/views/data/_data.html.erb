@@ -3,4 +3,5 @@
   t.column :link, :sortable => false do |datum|
     link_to(datum.id.to_s, "/data/#{datum.id}")
   end
+  t.column :inspect, :title => 'Raw'
 end %>
