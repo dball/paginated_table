@@ -167,10 +167,10 @@ module PaginatedTable
     end
 
     describe "#render" do
-      it "makes a div.pagination with the table and a pagination header and footer" do
+      it "makes a div.paginated_table with the table and a pagination header and footer" do
         table.stubs(:render_pagination_area).returns("<pagination/>")
         table.stubs(:render_table).returns("<table/>")
-        view.expects(:content_tag).with('div', "<pagination/><table/><pagination/>", :class => 'pagination')
+        view.expects(:content_tag).with('div', "<pagination/><table/><pagination/>", :class => 'paginated_table')
         table.render
       end
     end

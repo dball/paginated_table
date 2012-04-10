@@ -59,7 +59,7 @@ module PaginatedTable
     def render
       pagination_area = render_pagination_area
       content = pagination_area + render_table + pagination_area
-      @view.content_tag('div', content, :class => 'pagination')
+      @view.content_tag('div', content, :class => 'paginated_table')
     end
 
     def render_pagination_area

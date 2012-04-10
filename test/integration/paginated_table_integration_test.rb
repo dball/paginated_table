@@ -187,7 +187,7 @@ describe "paginated_table integration" do
   end
 
   def pagination_xpath
-    "//div[@class='pagination']"
+    "//div[@class='paginated_table']"
   end
 
   def pagination_header_xpath

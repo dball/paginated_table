@@ -66,7 +66,7 @@ and in `products.html.erb`:
           table.column :qty, :title => 'Quantity'
         end %>
 
-The `div.pagination` element on the page will be updated for successful
+The `div.paginated_table` element on the page will be updated for successful
 AJAX responses.
 
 The table DSL provides a column method by which you describe the table.
@@ -79,14 +79,14 @@ Columns are sortable by default, but may be rendered unsortable with the
 The table gets a header row with titleized column names, and a
 wrapping header and footer with pagination info and links. The
 pagination links are decorated to be AJAX requests by jquery-rails, the
-results of which overwrite the pagination div. The column names
+results of which overwrite the paginated_table div. The column names
 corresponding to sortable columns are linked to sort the table
 ascending, then descending, restarting at the first page of the
 collection.
 
 ### Output
 
-    <div class="pagination">
+    <div class="paginated_table">
       <div class="header">
         <div class="info">
           ... will_paginate info ...
