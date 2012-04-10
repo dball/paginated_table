@@ -92,17 +92,22 @@ describe "paginated_table integration" do
 
   describe "sorting" do
     describe "decoration" do
+      it "marks the sortable columns" do
+        visit "/data"
+        page.has_xpath?("#{th_xpath(1)}[@class='sortable'][.='Name']").must_equal true
+      end
+
       it "marks the sort column when sorted in ascending order" do
         visit "/data"
         click_link "Name"
-        page.has_xpath?("#{th_xpath(1)}[@class='sorted_asc'][.='Name']").must_equal true
+        page.has_xpath?("#{th_xpath(1)}[@class='sortable sorted_asc'][.='Name']").must_equal true
       end
 
       it "marks the sort column when sorted in descending order" do
         visit "/data"
         click_link "Name"
         click_link "Name"
-        page.has_xpath?("#{th_xpath(1)}[@class='sorted_desc'][.='Name']").must_equal true
+        page.has_xpath?("#{th_xpath(1)}[@class='sortable sorted_desc'][.='Name']").must_equal true
       end
     end
 

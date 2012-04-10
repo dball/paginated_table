@@ -94,10 +94,15 @@ module PaginatedTable
     end
 
     def render_table_header_column(column)
-      attributes = {}
-      if @data_page.page.sort_column == column.name.to_s
-        attributes[:class] = "sorted_#{@data_page.page.sort_direction}"
+      css = []
+      if column.sortable?
+        css << 'sortable'
       end
+      if @data_page.page.sort_column == column.name.to_s
+        css << "sorted_#{@data_page.page.sort_direction}"
+      end
+      attributes = {}
+      attributes[:class] = css.join(' ') unless css.empty?
       @view.content_tag('th', render_table_header_column_content(column), attributes)
     end
 

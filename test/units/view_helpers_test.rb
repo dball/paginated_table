@@ -227,27 +227,29 @@ module PaginatedTable
 
     describe "#render_table_header_column" do
       it "makes a th with the render_header from the column" do
-        column = stub("column", :name => 'foo')
+        column = stub("column", :name => 'foo', :sortable? => false)
         table.stubs(:render_table_header_column_content).with(column).returns("<header/>")
         view.expects(:content_tag).with('th', "<header/>", {})
         table.render_table_header_column(column)
       end
 
       describe "when the table is sorted on the column ascending" do
-        it "makes a th with css class 'sorted_asc'" do
-          column = stub("column", :name => 'title')
+        it "makes a th with css class 'sortable sorted_asc'" do
+          column = stub("column", :name => 'title', :sortable? => true)
           table.stubs(:render_table_header_column_content).with(column).returns("<header/>")
-          view.expects(:content_tag).with('th', "<header/>", :class => 'sorted_asc')
+          view.expects(:content_tag).
+            with('th', "<header/>", :class => 'sortable sorted_asc')
           table.render_table_header_column(column)
         end
       end
 
       describe "when the table is sorted on the column descending" do
-        it "makes a th with css class 'sorted_asc'" do
-          column = stub("column", :name => 'title')
+        it "makes a th with css class 'sortable sorted_asc'" do
+          column = stub("column", :name => 'title', :sortable? => true)
           page.stubs(:sort_direction => 'desc')
           table.stubs(:render_table_header_column_content).with(column).returns("<header/>")
-          view.expects(:content_tag).with('th', "<header/>", :class => 'sorted_desc')
+          view.expects(:content_tag).
+            with('th', "<header/>", :class => 'sortable sorted_desc')
           table.render_table_header_column(column)
         end
       end
