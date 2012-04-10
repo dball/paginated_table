@@ -4,7 +4,7 @@ module PaginatedTable
       raise ArgumentError if tables.length > 1
       name, collection = tables.first
       page = PageParams.create_page_from_params(params)
-      data_page = DataPager.data_for_page(collection, page)
+      data_page = DataPage.new(collection, page)
       instance_variable_set(:"@#{name}", data_page)
       render :partial => name.to_s, :layout => false if request.xhr?
     end

@@ -13,11 +13,12 @@ module PaginatedTable
       let(:collection) { stub("collection") }
       let(:tables) { { "collection_name" => collection } }
       let(:page) { stub("page") }
-      let(:data_page) { stub("data_page") }
+      let(:data) { stub("data") }
+      let(:data_page) { stub("data_page", :data => data, :page => page) }
 
       before do
         PageParams.stubs(:create_page_from_params).with(params).returns(page)
-        DataPager.stubs(:data_for_page).with(collection, page).returns(data_page)
+        DataPage.stubs(:new).with(collection, page).returns(data_page)
       end
 
       it "sets an instance variable on the controller with the data page" do

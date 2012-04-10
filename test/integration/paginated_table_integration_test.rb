@@ -97,6 +97,13 @@ describe "paginated_table integration" do
         click_link "Name"
         page.has_xpath?("#{th_xpath(1)}[@class='sorted_asc'][.='Name']").must_equal true
       end
+
+      it "marks the sort column when sorted in descending order" do
+        visit "/data"
+        click_link "Name"
+        click_link "Name"
+        page.has_xpath?("#{th_xpath(1)}[@class='sorted_desc'][.='Name']").must_equal true
+      end
     end
 
     describe "without javascript" do

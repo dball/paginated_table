@@ -66,22 +66,22 @@ module PaginatedTable
     end
   end
 
-  class DataPager
-    def self.data_for_page(collection, page)
-      ordered_collection = ordered_collection_for_page(collection, page)
-      ordered_collection.paginate(pagination_params_for_page(page))
+  class DataPage
+    attr_reader :page, :data
+
+    def initialize(collection, page)
+      @page = page
+      @data = collection.order(order_clause).paginate(pagination_params)
     end
 
-    def self.ordered_collection_for_page(collection, page)
-      collection.order(order_clause_for_page(page))
+    private
+
+    def order_clause
+      "#{@page.sort_column} #{@page.sort_direction}"
     end
 
-    def self.pagination_params_for_page(page)
-      { :page => page.number, :per_page => page.rows }
-    end
-
-    def self.order_clause_for_page(page)
-      "#{page.sort_column} #{page.sort_direction}"
+    def pagination_params
+      { :page => @page.number, :per_page => @page.rows }
     end
   end
 end

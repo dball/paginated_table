@@ -1,10 +1,10 @@
 module PaginatedTable
   module ViewHelpers
-    def paginated_table(collection, &block)
+    def paginated_table(data_page, &block)
       table_description = TableDescription.new(block)
       page = PageParams.create_page_from_params(params)
       link_renderer = LinkRenderer.new(page)
-      table_renderer = RendersTable.new(self, table_description, collection, link_renderer)
+      table_renderer = RendersTable.new(self, table_description, data_page, link_renderer)
       table_renderer.render
     end
   end
@@ -49,10 +49,10 @@ module PaginatedTable
   end
 
   class RendersTable
-    def initialize(view, description, collection, link_renderer)
+    def initialize(view, description, data_page, link_renderer)
       @view = view
       @description = description
-      @collection = collection
+      @data_page = data_page
       @link_renderer = link_renderer
     end
 
@@ -68,12 +68,12 @@ module PaginatedTable
     end
 
     def render_pagination_info
-      content = @view.page_entries_info(@collection)
+      content = @view.page_entries_info(@data_page.data)
       @view.content_tag('div', content, :class => 'info')
     end
 
     def render_pagination_links
-      content = @view.will_paginate(@collection, :renderer => @link_renderer)
+      content = @view.will_paginate(@data_page.data, :renderer => @link_renderer)
       @view.content_tag('div', content, :class => 'links')
     end
 
@@ -94,7 +94,11 @@ module PaginatedTable
     end
 
     def render_table_header_column(column)
-      @view.content_tag('th', render_table_header_column_content(column))
+      attributes = {}
+      if @data_page.page.sort_column == column.name.to_s
+        attributes[:class] = "sorted_#{@data_page.page.sort_direction}"
+      end
+      @view.content_tag('th', render_table_header_column_content(column), attributes)
     end
 
     def render_table_header_column_content(column)
@@ -107,7 +111,7 @@ module PaginatedTable
     end
 
     def render_table_body
-      content = @collection.map { |datum|
+      content = @data_page.data.map { |datum|
         render_table_body_row(datum)
       }.reduce(&:+)
       @view.content_tag('tbody', content)

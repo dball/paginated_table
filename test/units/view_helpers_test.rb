@@ -9,7 +9,7 @@ module PaginatedTable
       view.stubs("params" => params)
       view
     }
-    let(:collection) { stub("collection") }
+    let(:data_page) { stub("data_page") }
     let(:description_block) { lambda {} }
 
     describe "#paginated_table" do
@@ -22,10 +22,10 @@ module PaginatedTable
         LinkRenderer.stubs("new").with(page).returns(link_renderer)
         table_renderer = stub("table_renderer")
         RendersTable.stubs("new").
-          with(view, table_description, collection, link_renderer).
+          with(view, table_description, data_page, link_renderer).
           returns(table_renderer)
         table_renderer.expects("render")
-        view.paginated_table(collection, &description_block)
+        view.paginated_table(data_page, &description_block)
       end
     end
   end
@@ -107,12 +107,12 @@ module PaginatedTable
 
   describe LinkRenderer do
     let(:page) { Page.new(:number => 2, :rows => 5, :sort_column => 'to_s', :sort_direction => 'desc') }
-    let(:collection) { (1..10).to_a }
-    let(:data_page) { collection.paginate(:page => 2, :per_page => 5) }
+    let(:data) { (1..10).to_a }
+    let(:data_page) { data.paginate(:page => 2, :per_page => 5) }
     let(:view) { stub("view") }
     let(:renderer) do
       renderer = LinkRenderer.new(page)
-      renderer.prepare(collection, {}, view)
+      renderer.prepare(data, {}, view)
       renderer
     end
     let(:text) { stub("text") }
@@ -149,12 +149,14 @@ module PaginatedTable
   describe RendersTable do
     let(:view) { stub("view") }
     let(:description) { stub("description") }
-    let(:collection) { stub("collection") }
+    let(:data) { stub("data") }
+    let(:page) { stub("page", :sort_column => 'title', :sort_direction => 'asc') }
+    let(:data_page) { stub("data_page", :data => data, :page => page) }
     let(:link_renderer) { stub("link_renderer") }
-    let(:table) { RendersTable.new(view, description, collection, link_renderer) }
+    let(:table) { RendersTable.new(view, description, data_page, link_renderer) }
 
     describe "#initialize" do
-      it "creates a new instance with the view, description, and collection" do
+      it "creates a new instance with the view, description, and data_page" do
         table
       end
     end
@@ -179,7 +181,7 @@ module PaginatedTable
 
     describe "#render_pagination_info" do
       it "makes a div.info with the page_entries_info from will_paginate" do
-        view.stubs(:page_entries_info).with(collection).returns("<info/>")
+        view.stubs(:page_entries_info).with(data).returns("<info/>")
         view.expects(:content_tag).with('div', "<info/>", :class => 'info')
         table.render_pagination_info
       end
@@ -188,7 +190,7 @@ module PaginatedTable
     describe "#render_pagination_links" do
       it "makes a div.links with the will_paginate links from will_paginate" do
         view.stubs(:will_paginate).
-          with(collection, :renderer => link_renderer).
+          with(data, :renderer => link_renderer).
           returns("<links/>")
         view.expects(:content_tag).with('div', "<links/>", :class => 'links')
         table.render_pagination_links
@@ -225,14 +227,29 @@ module PaginatedTable
 
     describe "#render_table_header_column" do
       it "makes a th with the render_header from the column" do
-        column = stub("column")
+        column = stub("column", :name => 'foo')
         table.stubs(:render_table_header_column_content).with(column).returns("<header/>")
-        view.expects(:content_tag).with('th', "<header/>")
+        view.expects(:content_tag).with('th', "<header/>", {})
         table.render_table_header_column(column)
       end
 
       describe "when the table is sorted on the column ascending" do
-        it "makes a th with css 'sorted_asc'"
+        it "makes a th with css class 'sorted_asc'" do
+          column = stub("column", :name => 'title')
+          table.stubs(:render_table_header_column_content).with(column).returns("<header/>")
+          view.expects(:content_tag).with('th', "<header/>", :class => 'sorted_asc')
+          table.render_table_header_column(column)
+        end
+      end
+
+      describe "when the table is sorted on the column descending" do
+        it "makes a th with css class 'sorted_asc'" do
+          column = stub("column", :name => 'title')
+          page.stubs(:sort_direction => 'desc')
+          table.stubs(:render_table_header_column_content).with(column).returns("<header/>")
+          view.expects(:content_tag).with('th', "<header/>", :class => 'sorted_desc')
+          table.render_table_header_column(column)
+        end
       end
     end
 
@@ -259,7 +276,8 @@ module PaginatedTable
     describe "#render_table_body" do
       it "makes a tbody with the table body rows" do
         data = [stub("datum1"), stub("datum2")]
-        table = RendersTable.new(view, description, data, link_renderer)
+        data_page = stub("data_page", :data => data)
+        table = RendersTable.new(view, description, data_page, link_renderer)
         table.stubs(:render_table_body_row).with(data.first).returns("<row1/>")
         table.stubs(:render_table_body_row).with(data.last).returns("<row2/>")
         view.expects(:content_tag).with('tbody', "<row1/><row2/>")

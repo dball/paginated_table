@@ -156,8 +156,8 @@ module PaginatedTable
     end
   end
 
-  describe DataPager do
-    describe ".data_for_page" do
+  describe DataPage do
+    describe "#data" do
       let(:page) {
         Page.new(
           :number => 2,
@@ -176,9 +176,15 @@ module PaginatedTable
       }
 
       it "sorts the collection and pages to the given page number" do
-        DataPager.data_for_page(collection, page).must_equal(
+        DataPage.new(collection, page).data.must_equal(
           ["Name 5", "Name 6", "Name 7", "Name 8", "Name 9"]
         )
+      end
+
+      describe "#page" do
+        it "provides a reference to the given page" do
+          DataPage.new(collection, page).page.must_equal page
+        end
       end
     end
   end
