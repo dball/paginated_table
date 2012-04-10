@@ -25,9 +25,10 @@ module PaginatedTable
         controller.instance_variable_get("@collection_name").must_equal data_page
       end
 
-      it "renders without layout if request is xhr?" do
+      it "renders the named partial without layout if request is xhr?" do
         request.stubs(:xhr? => true)
-        controller.expects(:render).with(:layout => false)
+        controller.expects(:render).
+          with(:partial => "collection_name", :layout => false)
         controller.paginated_table(tables)
       end
 

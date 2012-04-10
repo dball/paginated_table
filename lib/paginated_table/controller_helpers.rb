@@ -6,7 +6,7 @@ module PaginatedTable
       page = PageParams.create_page_from_params(params)
       data_page = DataPager.data_for_page(collection, page)
       instance_variable_set(:"@#{name}", data_page)
-      render :layout => false if request.xhr?
+      render :partial => name.to_s, :layout => false if request.xhr?
     end
   end
 end

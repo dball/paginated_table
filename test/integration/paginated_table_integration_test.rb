@@ -31,6 +31,19 @@ describe "paginated_table integration" do
         page.has_xpath?("#{tr_xpath(row)}/td[2]/a[@href='/data/#{row}'][.='#{row}']").must_equal true
       end
     end
+
+    describe "with javascript" do
+      before do
+        Capybara.current_driver = Capybara.javascript_driver
+      end
+
+      it "updates only the pagination table from pagination table links" do
+        visit "/data"
+        click_link "2"
+        wait_for_ajax_request
+        page.has_xpath?("//h1[2]").must_equal false
+      end
+    end
   end
 
   describe "pagination" do
