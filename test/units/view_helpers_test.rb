@@ -230,6 +230,10 @@ module PaginatedTable
         view.expects(:content_tag).with('th', "<header/>")
         table.render_table_header_column(column)
       end
+
+      describe "when the table is sorted on the column ascending" do
+        it "makes a th with css 'sorted_asc'"
+      end
     end
 
     describe "#render_table_header_column_content" do

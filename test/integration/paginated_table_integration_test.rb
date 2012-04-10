@@ -91,6 +91,14 @@ describe "paginated_table integration" do
   end
 
   describe "sorting" do
+    describe "decoration" do
+      it "marks the sort column when sorted in ascending order" do
+        visit "/data"
+        click_link "Name"
+        page.has_xpath?("#{th_xpath(1)}[@class='sorted_asc'][.='Name']").must_equal true
+      end
+    end
+
     describe "without javascript" do
       it "follows the link to sort the first column in ascending order" do
         visit "/data"
