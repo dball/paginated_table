@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = PaginatedTable::VERSION
   s.authors     = ["Donald Ball"]
   s.email       = ["donald.ball@gmail.com"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of PaginatedTable."
-  s.description = "TODO: Description of PaginatedTable."
+  s.homepage    = "http://github.com/dball/paginated_table"
+  s.summary     = "Easy paginated, sorted tables in rails"
+  s.description = "Provides AJAX paginated, sorted tables in rails with will_paginate and arel"
 
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
