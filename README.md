@@ -83,6 +83,45 @@ corresponding to sortable columns are linked to sort the table
 ascending, then descending, restarting at the first page of the
 collection.
 
+### Output
+
+    <div class="pagination">
+      <div class="header">
+        <div class="info">
+          ... will_paginate info ...
+        </div>
+        <div class="links">
+          <div class="pagination">
+            ... will_paginate links ...
+          </div>
+        </div>
+      </div>
+      <table class="paginated">
+        <thead>
+          <tr>
+            <th class="sortable sorted_asc">...</th>
+            <th class="sortable">...</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>...</td>
+            <td>...</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footer">
+        <div class="info">
+          ... will_paginate info ...
+        </div>
+        <div class="links">
+          <div class="pagination">
+            ... will_paginate links ...
+          </div>
+        </div>
+      </div>
+    </div>
+
 ## TODO
 
 * AJAX links should be optional
