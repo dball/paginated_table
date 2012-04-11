@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.summary     = "Easy paginated, sorted tables in rails"
   s.description = "Provides AJAX paginated, sorted tables in rails with will_paginate and arel"
 
-  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
+  s.files = Dir["{lib, vendor}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "rails", "~> 3.2"
