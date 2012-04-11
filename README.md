@@ -1,6 +1,6 @@
 # PaginatedTable
 
-[![Build Status](https://secure.travis-ci.org/dball/paginated_table.png)](http://travis-ci.org/dball/paginated\_table)
+[![Build Status](https://secure.travis-ci.org/dball/paginated_table.png)](http://travis-ci.org/dball/paginated_table)
 
 PaginatedTable is a Rails plugin that makes rendering paginated, sorted
 HTML tables dead simple.
@@ -13,10 +13,10 @@ HTML tables dead simple.
 
 ## Installation
 
-Add `paginated\_table` to your `Gemfile` and `bundle install`.
+Add `paginated_table` to your `Gemfile` and `bundle install`.
 
-Add the `paginated\_table` javascript to your application's javascript
-requires after `jquery` and `jquery\_ujs`:
+Add the `paginated_table` javascript to your application's javascript
+requires after `jquery` and `jquery_ujs`:
 
     //= require jquery
     //= require jquery_ujs
@@ -130,3 +130,15 @@ collection.
 * AJAX busy indicator
 
 * AJAX error indicator
+
+* Partial should infer ivar by template name?
+
+* Escaped HTML leaks in the will_paginate links
+
+* Explicitly enable the :rows option
+  * It really belongs in the view helper, but it's simpler to implement
+    in the controller helper
+
+* Global configuration
+  * rows per page
+  * AJAX links
