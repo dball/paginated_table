@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    paginated_table (0.0.1)
+    paginated_table (0.0.2)
       jquery-rails
       rails (~> 3.2)
       will_paginate (~> 3.0)
@@ -111,7 +111,7 @@ GEM
     treetop (1.4.10)
       polyglot
       polyglot (>= 0.3.1)
-    tzinfo (0.3.32)
+    tzinfo (0.3.33)
     will_paginate (3.0.3)
     xpath (0.1.4)
       nokogiri (~> 1.3)
