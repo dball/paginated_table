@@ -137,8 +137,10 @@ module PaginatedTable
 
     describe "#tag" do
       it "calls link_to on the view with the :remote option for :a tags" do
+        html_safe_text = stub("html_safe_text")
+        text = stub("text", :to_s => stub("string", :html_safe => html_safe_text))
         view.expects(:link_to).
-          with(text, href, { :class => 'highlight', :remote => true }).
+          with(html_safe_text, href, { :class => 'highlight', :remote => true }).
           returns(link)
         renderer.tag(:a, text, :class => 'highlight', :href => href).must_equal link
       end

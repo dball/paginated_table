@@ -146,7 +146,7 @@ module PaginatedTable
 
     def tag(name, value, attributes = {})
       if name == :a
-        @template.link_to(value, attributes.delete(:href), attributes.merge(:remote => true))
+        @template.link_to(value.to_s.html_safe, attributes.delete(:href), attributes.merge(:remote => true))
       else
         super
       end
