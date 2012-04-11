@@ -149,3 +149,6 @@ In an initializer, e.g. `config/initializers/paginated_table.rb`:
 
 * Global configuration
   * AJAX links
+
+* :per_page request param should be allowed to be ignored or restricted
+  to a configurable maximum
