@@ -123,6 +123,14 @@ collection.
       </div>
     </div>
 
+### Global Configuration
+
+In an initializer, e.g. `config/initializers/paginated_table.rb`:
+
+    PaginatedTable.configure do |config|
+      config.rows_per_page = 20
+    end
+
 ## TODO
 
 * AJAX links should be optional
@@ -140,5 +148,4 @@ collection.
     in the controller helper
 
 * Global configuration
-  * rows per page
   * AJAX links

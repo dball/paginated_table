@@ -2,7 +2,6 @@ module PaginatedTable
   class Page
 
     SORT_DIRECTIONS = %w(asc desc)
-    DEFAULT_PER_PAGE = 10
 
     attr_reader :number, :rows, :sort_column, :sort_direction
 
@@ -14,7 +13,7 @@ module PaginatedTable
     def initialize(attributes)
       @number = Integer(attributes[:number] || 1)
       raise ArgumentError unless @number > 0
-      @rows = Integer(attributes[:rows] || DEFAULT_PER_PAGE)
+      @rows = Integer(attributes[:rows] || PaginatedTable.configuration.rows_per_page)
       raise ArgumentError unless @rows > 0
       @sort_column = attributes[:sort_column] || 'id'
       @sort_direction = attributes[:sort_direction] || 'asc'
