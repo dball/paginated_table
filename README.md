@@ -152,3 +152,7 @@ In an initializer, e.g. `config/initializers/paginated_table.rb`:
 
 * :per_page request param should be allowed to be ignored or restricted
   to a configurable maximum
+
+* scope th header elements to column
+
+* allow column cells to render as th elements
