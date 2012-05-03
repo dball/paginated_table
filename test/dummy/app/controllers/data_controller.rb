@@ -11,7 +11,7 @@ class DataController < ApplicationController
     column, direction = arg.split
     sorted_data = case column
     when 'name' then DATA.sort_by { |datum| datum[1] }
-    when 'id' then DATA
+    when 'id' then DATA.sort_by { |datum| datum[0] }
     else raise "Invalid column: #{column}"
     end
     case direction
@@ -22,6 +22,6 @@ class DataController < ApplicationController
   end
 
   def index
-    paginated_table(:data => DATA)
+    paginated_table('data', DATA)
   end
 end

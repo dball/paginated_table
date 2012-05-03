@@ -10,8 +10,8 @@ module PaginatedTable
     }
 
     describe "#paginated_table" do
+      let(:name) { "collection_name" }
       let(:collection) { stub("collection") }
-      let(:tables) { { "collection_name" => collection } }
       let(:page) { stub("page") }
       let(:data) { stub("data") }
       let(:data_page) { stub("data_page", :data => data, :page => page) }
@@ -22,21 +22,20 @@ module PaginatedTable
       end
 
       it "sets an instance variable on the controller with the data page" do
-        controller.paginated_table(tables)
-        controller.instance_variable_get("@collection_name").must_equal data_page
+        controller.paginated_table(name, collection)
+        controller.instance_variable_get("@#{name}").must_equal data_page
       end
 
       it "renders the named partial without layout if request is xhr?" do
         request.stubs(:xhr? => true)
-        controller.expects(:render).
-          with(:partial => "collection_name", :layout => false)
-        controller.paginated_table(tables)
+        controller.expects(:render).with(:partial => name, :layout => false)
+        controller.paginated_table(name, collection)
       end
 
       it "does not render if request is not xhr?" do
         request.stubs(:xhr? => false)
         controller.expects(:render).never
-        controller.paginated_table(tables)
+        controller.paginated_table(name, collection)
       end
     end
   end
