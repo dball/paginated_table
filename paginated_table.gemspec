@@ -13,12 +13,22 @@ Gem::Specification.new do |s|
   s.summary     = "Easy paginated, sorted tables in rails"
   s.description = "Provides AJAX paginated, sorted tables in rails with will_paginate and arel"
 
-  s.files = Dir["{lib, vendor}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
+  s.files = [
+    'lib/paginated_table.rb',
+    'lib/paginated_table/config.rb',
+    'lib/paginated_table/controller_helpers.rb',
+    'lib/paginated_table/engine.rb',
+    'lib/paginated_table/page.rb',
+    'lib/paginated_table/railtie.rb',
+    'lib/paginated_table/version.rb',
+    'lib/paginated_table/view_helpers.rb',
+    'vendor/assets/javascripts/paginated_table.js'
+  ]
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "rails", "~> 3.2"
   s.add_dependency "will_paginate", "~> 3.0"
-  s.add_dependency "jquery-rails"
+  s.add_dependency "jquery-rails", "~> 2.0"
 
   s.add_development_dependency "minitest"
   s.add_development_dependency "capybara"

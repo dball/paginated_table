@@ -1,3 +1,8 @@
+# v0.0.3
+
+* Fixes gemspec to include vendor assets
+* Adds jquery-rails version constraint
+
 # v0.0.2
 
 * Global configuration
