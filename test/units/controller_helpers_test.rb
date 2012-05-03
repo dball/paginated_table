@@ -17,7 +17,7 @@ module PaginatedTable
       let(:data_page) { stub("data_page", :data => data, :page => page) }
 
       before do
-        PageParams.stubs(:create_page).with(params).returns(page)
+        PageParams.stubs(:create_page).with(params, {}).returns(page)
         DataPage.stubs(:new).with(collection, page).returns(data_page)
       end
 
