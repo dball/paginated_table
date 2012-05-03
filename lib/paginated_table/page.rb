@@ -46,7 +46,7 @@ module PaginatedTable
   end
 
   class PageParams
-    def self.create_page_from_params(params)
+    def self.create_page(params)
       Page.new(
         :number => params[:page],
         :rows => params[:per_page],

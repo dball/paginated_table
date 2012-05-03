@@ -2,7 +2,7 @@ module PaginatedTable
   module ViewHelpers
     def paginated_table(data_page, &block)
       table_description = TableDescription.new(block)
-      page = PageParams.create_page_from_params(params)
+      page = PageParams.create_page(params)
       link_renderer = LinkRenderer.new(page)
       table_renderer = RendersTable.new(self, table_description, data_page, link_renderer)
       table_renderer.render

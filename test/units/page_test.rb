@@ -123,9 +123,9 @@ module PaginatedTable
   end
 
   describe PageParams do
-    describe ".create_from_params" do
+    describe ".create_page" do
       it "returns a new page created from the request params" do
-        page = PageParams.create_page_from_params(
+        page = PageParams.create_page(
           :page => '2',
           :per_page => '5',
           :sort_column => 'name',

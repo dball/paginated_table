@@ -17,7 +17,7 @@ module PaginatedTable
         table_description = stub("table_description")
         TableDescription.stubs("new").with(description_block).returns(table_description)
         page = stub("page")
-        PageParams.stubs("create_page_from_params").with(params).returns(page)
+        PageParams.stubs("create_page").with(params).returns(page)
         link_renderer = stub("link_renderer")
         LinkRenderer.stubs("new").with(page).returns(link_renderer)
         table_renderer = stub("table_renderer")
