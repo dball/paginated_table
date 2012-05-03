@@ -1,3 +1,8 @@
+# v0.0.4
+
+* Changes paginated_table controller method signature
+* Adds default options to paginated_table controller method
+
 # v0.0.3
 
 * Fixes gemspec to include vendor assets

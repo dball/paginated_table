@@ -9,7 +9,7 @@ HTML tables dead simple.
 
 * rails 3.2 (3.1 may work)
 * will_paginate 3.0
-* jquery-rails
+* jquery-rails 2.0
 
 ## Installation
 
@@ -34,14 +34,16 @@ action that paginates a table:
 
     class ProductsController < ApplicationController
       def index
-        paginated_table :products => Product.all
+        paginated_table('products', Product.all,
+          :defaults => { :sort_column => 'name' }
+        )
       end
     end
 
 This will sort the collection using Arel's order method, paginate
 the given collection using will_paginate, store the
-page in an instance variable with the name of the hash key, e.g.
-`@products`, and if the request is AJAX, renders a partial response.
+page in an instance variable of the given name, e.g. `@products`,
+and if the request is AJAX, renders a partial response.
 
 ### View
 
@@ -140,8 +142,6 @@ In an initializer, e.g. `config/initializers/paginated_table.rb`:
 * AJAX error indicator
 
 * Partial should infer ivar by template name?
-
-* Escaped HTML leaks in the will_paginate links
 
 * Explicitly enable the :rows option
   * It really belongs in the view helper, but it's simpler to implement
