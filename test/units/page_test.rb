@@ -136,6 +136,17 @@ module PaginatedTable
         page.sort_column.must_equal 'name'
         page.sort_direction.must_equal 'desc'
       end
+
+      it "returns a new page created from the request params and the defaults" do
+        page = PageParams.create_page(
+          { :page => '2', :per_page => '5' },
+          { :sort_column => 'name', :sort_direction => 'desc' }
+        )
+        page.number.must_equal 2
+        page.rows.must_equal 5
+        page.sort_column.must_equal 'name'
+        page.sort_direction.must_equal 'desc'
+      end
     end
 
     describe ".to_params" do

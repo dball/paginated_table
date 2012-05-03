@@ -46,7 +46,8 @@ module PaginatedTable
   end
 
   class PageParams
-    def self.create_page(params)
+    def self.create_page(request_params, defaults = {})
+      params = request_params.reverse_merge(defaults)
       Page.new(
         :number => params[:page],
         :rows => params[:per_page],
