@@ -5,7 +5,7 @@ class DataController < ApplicationController
 
   DATA = (1..100).map do |i|
     Datum.new(i, "Name #{i}")
-  end
+  end.shuffle
 
   def DATA.order(arg)
     column, direction = arg.split
@@ -22,6 +22,6 @@ class DataController < ApplicationController
   end
 
   def index
-    paginated_table('data', DATA)
+    paginated_table('data', DATA, :defaults => { :sort_column => 'id' })
   end
 end
