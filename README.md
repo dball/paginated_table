@@ -107,10 +107,15 @@ collection.
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class="odd">
             <td>...</td>
             <td>...</td>
           </tr>
+          <tr class="even">
+            <td>...</td>
+            <td>...</td>
+          </tr>
+          ... more rows ...
         </tbody>
       </table>
       <div class="footer">

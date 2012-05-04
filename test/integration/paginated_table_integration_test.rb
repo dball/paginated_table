@@ -42,6 +42,12 @@ describe "paginated_table integration" do
       end
     end
 
+    it "cycles the 'odd' and 'even' css classes on the data rows" do
+      (1..10).each do |row|
+        page.has_xpath?("#{tr_xpath(row)}[@class='#{row.odd? ? 'odd' : 'even'}']").must_equal true
+      end
+    end
+
     describe "with javascript" do
       before do
         Capybara.current_driver = Capybara.javascript_driver

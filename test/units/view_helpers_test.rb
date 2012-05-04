@@ -316,7 +316,9 @@ module PaginatedTable
         description.stubs(:columns).returns(columns)
         table.stubs(:render_table_body_cell).with(datum, columns.first).returns("<cell1/>")
         table.stubs(:render_table_body_cell).with(datum, columns.last).returns("<cell2/>")
-        view.expects(:content_tag).with('tr', "<cell1/><cell2/>")
+        css = stub("css")
+        view.stubs(:cycle).with('odd', 'even').returns(css)
+        view.expects(:content_tag).with('tr', "<cell1/><cell2/>", :class => css)
         table.render_table_body_row(datum)
       end
     end

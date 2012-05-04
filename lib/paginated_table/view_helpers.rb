@@ -137,7 +137,7 @@ module PaginatedTable
       content = @description.columns.map { |column|
         render_table_body_cell(datum, column)
       }.reduce(&:+)
-      @view.content_tag('tr', content)
+      @view.content_tag('tr', content, :class => @view.cycle('odd', 'even'))
     end
 
     def render_table_body_cell(datum, column)
