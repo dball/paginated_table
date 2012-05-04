@@ -1,3 +1,7 @@
+# v0.0.5
+
+* Sort links preserve get request parameters
+
 # v0.0.4
 
 * Changes paginated_table controller method signature
