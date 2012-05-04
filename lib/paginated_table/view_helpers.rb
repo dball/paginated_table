@@ -155,7 +155,10 @@ module PaginatedTable
 
     def sort_url(sort_on)
       new_page = @paginated_table_page.page_for_sort_column(sort_on)
-      @template.url_for(PageParams.to_params(new_page))
+      new_page_params = PageParams.to_params(new_page)
+      params = merge_get_params({})
+      symbolized_update(params, new_page_params)
+      @template.url_for(params)
     end
 
     def default_url_params

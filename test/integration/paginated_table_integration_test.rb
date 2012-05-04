@@ -186,6 +186,34 @@ describe "paginated_table integration" do
     end
   end
 
+  describe "searching" do
+    it "limits the results" do
+      visit "/data?search=secondhalf"
+      pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 50 in total"
+      (51..60).each_with_index do |id, index|
+        page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
+      end
+    end
+
+    it "following the page links preserves the search criteria" do
+      visit "/data?search=secondhalf"
+      click_link "2"
+      pagination_info_text.must_equal "Displaying data controller/data 11 - 20 of 50 in total"
+      (61..70).each_with_index do |id, index|
+        page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
+      end
+    end
+
+    it "following the sort links preserves the search criteria" do
+      visit "/data?search=secondhalf"
+      click_link "Name"
+      pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 50 in total"
+      [100, 51, 52, 53, 54, 55, 56, 57, 58, 59].each_with_index do |id, index|
+        page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
+      end
+    end
+  end
+
   def pagination_xpath
     "//div[@class='paginated_table']"
   end
