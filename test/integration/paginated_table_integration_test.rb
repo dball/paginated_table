@@ -36,6 +36,12 @@ describe "paginated_table integration" do
       end
     end
 
+    it "applies the 'centered' css class to the data in the first column" do
+      (1..10).each do |row|
+        page.has_xpath?("#{tr_xpath(row)}/td[1][@class='centered']").must_equal true
+      end
+    end
+
     describe "with javascript" do
       before do
         Capybara.current_driver = Capybara.javascript_driver

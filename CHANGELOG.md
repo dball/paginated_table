@@ -1,3 +1,7 @@
+# v0.0.6
+
+* Columns may have :class and :style options
+
 # v0.0.5
 
 * Sort links preserve get request parameters

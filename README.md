@@ -61,8 +61,8 @@ In `index.html.erb`:
 and in `products.html.erb`:
 
     <%= paginated_table(@products) do |table|
-          table.column :name, :sortable => false
-          table.column :price do |price|
+          table.column :name, :sortable => false, :class => 'centered'
+          table.column :price, :style => 'font-face: bold' do |price|
             format_currency(price)
           end
           table.column :qty, :title => 'Quantity'

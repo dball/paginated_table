@@ -74,6 +74,22 @@ module PaginatedTable
       end
     end
 
+    describe "#html_attributes" do
+      it "returns an empty hash by default" do
+        TableDescription::Column.new(:foo).html_attributes.must_equal({})
+      end
+
+      it "adds the css classes given by the :class option" do
+        TableDescription::Column.new(:foo, :class => %w(bar baz)).
+          html_attributes.must_equal({ :class => 'bar baz' })
+      end
+
+      it "adds the css styles given by the :style option" do
+        TableDescription::Column.new(:foo, :style => 'font-face: bold').
+          html_attributes.must_equal({ :style => 'font-face: bold' })
+      end
+    end
+
     describe "#render_header" do
       it "returns the titleized name" do
         TableDescription::Column.new(:foo).render_header.must_equal "Foo"
@@ -310,7 +326,9 @@ module PaginatedTable
         datum = stub("datum")
         column = stub("column")
         column.stubs(:render_cell).with(datum).returns("<datum/>")
-        view.expects(:content_tag).with('td', "<datum/>")
+        attributes = stub("attributes")
+        column.stubs(:html_attributes).with().returns(attributes)
+        view.expects(:content_tag).with('td', "<datum/>", attributes)
         table.render_table_body_cell(datum, column)
       end
     end

@@ -44,6 +44,18 @@ module PaginatedTable
       def sortable?
         @options.fetch(:sortable, true)
       end
+
+      def html_attributes
+        html_attributes = {}
+        if @options[:class]
+          html_attributes[:class] = Array(@options[:class]).join(' ')
+        end
+        if @options[:style]
+          html_attributes[:style] = @options[:style]
+        end
+        html_attributes
+      end
+
     end
   end
 
@@ -129,7 +141,7 @@ module PaginatedTable
     end
 
     def render_table_body_cell(datum, column)
-      @view.content_tag('td', column.render_cell(datum))
+      @view.content_tag('td', column.render_cell(datum), column.html_attributes)
     end
   end
 

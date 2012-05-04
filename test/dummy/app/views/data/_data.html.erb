@@ -1,7 +1,7 @@
 <%= paginated_table(@data) do |t|
-  t.column :name
+  t.column :name, :class => 'centered'
   t.column :link, :sortable => false do |datum|
     link_to(datum.id.to_s, "/data/#{datum.id}")
   end
-  t.column :inspect, :title => 'Raw'
+  t.column :inspect, :title => 'Raw', :style => 'text-format: smallcaps'
 end %>
