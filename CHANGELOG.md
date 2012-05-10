@@ -1,5 +1,6 @@
 # v0.0.7
 
+* Adds optional row descriptions
 * Adds option to specify partial name
 * Cycles odd and even css classes on the table rows
 

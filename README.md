@@ -68,9 +68,6 @@ and in `products.html.erb`:
           table.column :qty, :title => 'Quantity'
         end %>
 
-The `div.paginated_table` element on the page will be updated for successful
-AJAX responses.
-
 The table DSL provides a column method by which you describe the table.
 The column calls correspond to columns in the rendered table. Columns
 with no block send their name to the records to get their cell values, while
@@ -78,13 +75,56 @@ columns with blocks yield to them the records to get their cell values.
 Columns are sortable by default, but may be rendered unsortable with the
 :sortable option set to false.
 
-The table gets a header row with titleized column names, and a
-wrapping header and footer with pagination info and links. The
-pagination links are decorated to be AJAX requests by jquery-rails, the
-results of which overwrite the paginated_table div. The column names
-corresponding to sortable columns are linked to sort the table
-ascending, then descending, restarting at the first page of the
-collection.
+Data may be rendered across multiple rows:
+
+    <%= paginated_table(@products) do |table|
+      table.row do
+        table.column 'name'
+      end
+      table.row :cycle => false do
+        table.column 'description'
+      end
+    end %>
+
+The table description may have either rows or columns in the root, not both.
+Columns in the root are put into an implicit default row.
+
+Row options are:
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Default</th>
+      <th>Effect</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>:cycle</th>
+      <td>`%w(odd even)`</td>
+      <td>Cycles the given values in the tr's class attribute</td>
+    </tr>
+    <tr>
+      <th>:hidden</th>
+      <td>false</td>
+      <td>Hides the row with an inline style attribute value of `display: none`</td>
+    </tr>
+    <tr>
+      <th>:title</th>
+      <td>:header</td>
+      <td>Renders the row's column titles. If the value is :header, they will appear
+          in the table header, otherwise they will not appear anywhere.</td>
+    </tr>
+  </tbody>
+</table>
+
+Any sortable column titles rendered in the table header will be linked to
+an sort action; it sorts the column ascending if not already sorted, otherwise
+sorts the column descending. The table itself will be preceded and succeeded
+by a wrapping header and footer div with pagination info and links. The
+pagination and sort links will be decorated with rails ujs remote AJAX links,
+the results of which overwrite the paginated_table div.
 
 ### Output
 
