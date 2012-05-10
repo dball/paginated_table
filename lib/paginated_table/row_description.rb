@@ -28,5 +28,13 @@ module PaginatedTable
     def colspan(span)
       @table.colspan(span)
     end
+    
+    def html_attributes
+      html_attributes = {}
+      if hidden
+        html_attributes[:style] = 'display: none'
+      end
+      html_attributes
+    end
   end
 end

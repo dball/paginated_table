@@ -1,5 +1,6 @@
 # v0.0.7
 
+* Adds data-datum-id attribute to tr elements
 * Adds :span option to column description
 * Adds optional row descriptions
 * Adds option to specify partial name

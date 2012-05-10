@@ -13,7 +13,17 @@ class DataController < ApplicationController
 
   private
 
-  Datum = Struct.new(:id, :name)
+  class Datum < Struct.new(:id, :name)
+    extend ActiveModel::Naming
+
+    def to_key
+      [object_id]
+    end
+
+    def self.name
+      "Data"
+    end
+  end
 
   module OrderableData
     def order(arg)

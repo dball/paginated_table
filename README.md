@@ -161,6 +161,9 @@ by a wrapping header and footer div with pagination info and links. The
 pagination and sort links will be decorated with rails ujs remote AJAX links,
 the results of which overwrite the paginated_table div.
 
+Table rows will have an attribute named `data-datum-id` whose value is the
+result of calling `dom_id` on the view with the datum.
+
 ### Output
 
     <div class="paginated_table">
@@ -182,11 +185,11 @@ the results of which overwrite the paginated_table div.
           </tr>
         </thead>
         <tbody>
-          <tr class="odd">
+          <tr class="odd" data-datum-id="...">
             <td>...</td>
             <td>...</td>
           </tr>
-          <tr class="even">
+          <tr class="even" data-datum-id="...">
             <td>...</td>
             <td>...</td>
           </tr>

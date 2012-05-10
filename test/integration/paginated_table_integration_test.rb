@@ -66,13 +66,13 @@ describe "paginated_table integration" do
     describe "without javascript" do
       it "displays one page of results" do
         visit "/data"
-        pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 100 in total"
+        pagination_info_text.must_equal "Displaying Data 1 - 10 of 100 in total"
       end
 
       it "follows the link to the second page of results" do
         visit "/data"
         click_link "2"
-        pagination_info_text.must_equal "Displaying data controller/data 11 - 20 of 100 in total"
+        pagination_info_text.must_equal "Displaying Data 11 - 20 of 100 in total"
       end
     end
 
@@ -83,14 +83,14 @@ describe "paginated_table integration" do
 
       it "displays one page of results" do
         visit "/data"
-        pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 100 in total"
+        pagination_info_text.must_equal "Displaying Data 1 - 10 of 100 in total"
       end
 
       it "follows the link to the second page of results" do
         visit "/data"
         click_link "2"
         wait_for_ajax_request
-        pagination_info_text.must_equal "Displaying data controller/data 11 - 20 of 100 in total"
+        pagination_info_text.must_equal "Displaying Data 11 - 20 of 100 in total"
       end
 
       # Ensures the AJAX content is decorated with event handlers
@@ -98,10 +98,10 @@ describe "paginated_table integration" do
         visit "/data"
         click_link "4"
         wait_for_ajax_request
-        pagination_info_text.must_equal "Displaying data controller/data 31 - 40 of 100 in total"
+        pagination_info_text.must_equal "Displaying Data 31 - 40 of 100 in total"
         click_link "3"
         wait_for_ajax_request
-        pagination_info_text.must_equal "Displaying data controller/data 21 - 30 of 100 in total"
+        pagination_info_text.must_equal "Displaying Data 21 - 30 of 100 in total"
       end
     end
   end
@@ -201,7 +201,7 @@ describe "paginated_table integration" do
   describe "searching" do
     it "limits the results" do
       visit "/data?search=secondhalf"
-      pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 50 in total"
+      pagination_info_text.must_equal "Displaying Data 1 - 10 of 50 in total"
       (51..60).each_with_index do |id, index|
         page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
       end
@@ -210,7 +210,7 @@ describe "paginated_table integration" do
     it "following the page links preserves the search criteria" do
       visit "/data?search=secondhalf"
       click_link "2"
-      pagination_info_text.must_equal "Displaying data controller/data 11 - 20 of 50 in total"
+      pagination_info_text.must_equal "Displaying Data 11 - 20 of 50 in total"
       (61..70).each_with_index do |id, index|
         page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
       end
@@ -219,7 +219,7 @@ describe "paginated_table integration" do
     it "following the sort links preserves the search criteria" do
       visit "/data?search=secondhalf"
       click_link "Name"
-      pagination_info_text.must_equal "Displaying data controller/data 1 - 10 of 50 in total"
+      pagination_info_text.must_equal "Displaying Data 1 - 10 of 50 in total"
       [100, 51, 52, 53, 54, 55, 56, 57, 58, 59].each_with_index do |id, index|
         page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
       end

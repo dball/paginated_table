@@ -60,5 +60,16 @@ module PaginatedTable
         description.columns.must_equal [column]
       end
     end
+
+    describe "#html_attributes" do
+      it "return empty hash by default" do
+        description.html_attributes.must_equal({})
+      end
+
+      it "sets the css style to display: none when hidden" do
+        options[:hidden] = true
+        description.html_attributes.must_equal(:style => 'display: none')
+      end
+    end
   end
 end

@@ -168,16 +168,39 @@ module PaginatedTable
     end
 
     describe "#render_table_body_row" do
+      let(:datum) { stub("datum") }
+      let(:columns) { [stub("column1"), stub("column2")] }
+      let(:dom_id) { stub("dom_id") }
+      before do
+        view.stubs(:dom_id).with(datum).returns(dom_id)
+        table.stubs(:render_table_body_cell).
+          with(datum, columns.first).returns("<cell1/>")
+        table.stubs(:render_table_body_cell).
+          with(datum, columns.last).returns("<cell2/>")
+      end
+
       it "makes a tr with the table body cells" do
-        datum = stub("datum")
-        columns = [stub("column1"), stub("column2")]
-        cycle = stub("cycle")
-        row = stub("row", :columns => columns, :cycle => %w(foo bar))
-        table.stubs(:render_table_body_cell).with(datum, columns.first).returns("<cell1/>")
-        table.stubs(:render_table_body_cell).with(datum, columns.last).returns("<cell2/>")
+        row = stub("row", :columns => columns, :cycle => false, :hidden => false)
+        view.expects(:content_tag).
+          with('tr', "<cell1/><cell2/>", :"data-datum-id" => dom_id)
+        table.render_table_body_row(row, datum)
+      end
+
+      it "makes a tr with a css cycle" do
         css = stub("css")
         view.stubs(:cycle).with('foo', 'bar').returns(css)
-        view.expects(:content_tag).with('tr', "<cell1/><cell2/>", :class => css)
+        row = stub("row", :columns => columns, :cycle => %w(foo bar), :hidden => false)
+        view.expects(:content_tag).
+          with('tr', "<cell1/><cell2/>", :class => css, :"data-datum-id" => dom_id)
+        table.render_table_body_row(row, datum)
+      end
+
+      it "makes a tr with css style display: none" do
+        row = stub("row", :columns => columns, :cycle => nil, :hidden => true)
+        view.expects(:content_tag).
+          with('tr', "<cell1/><cell2/>",
+            :style => 'display: none', :"data-datum-id" => dom_id
+          )
         table.render_table_body_row(row, datum)
       end
     end

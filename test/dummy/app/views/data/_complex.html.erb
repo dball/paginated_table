@@ -1,16 +1,16 @@
 <%= paginated_table(@data) do |t|
-  t.row(:title => :header, :cycle => %w(odd even)) do
-    t.column 'name'
-    t.column 'inspect', :title => 'Raw', :style => 'text-format: smallcaps'
-    t.column 'expand' do |datum|
+  t.row :title => :header, :cycle => %w(odd even) do |row|
+    row.column 'name'
+    row.column 'inspect', :title => 'Raw', :style => 'text-format: smallcaps'
+    row.column 'expand' do |datum|
       t.link_to_expand_row('expand', datum)
     end
   end
-  t.row(:title => false, :hidden => true) do |t|
-    t.column 'link', :sortable => false, :span => 2 do |datum|
+  t.row :title => false, :hidden => true, :data_type => 'details' do |row|
+    row.column 'link', :sortable => false, :span => 2 do |datum|
       link_to(datum.id.to_s, "/data/#{datum.id}")
     end
-    t.column 'collapse' do |datum|
+    row.column 'collapse' do |datum|
       t.link_to_collapse_row('collapse', datum)
     end
   end

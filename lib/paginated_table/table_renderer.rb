@@ -95,6 +95,11 @@ module PaginatedTable
       if row.cycle
         options[:class] = @view.cycle(*row.cycle)
       end
+      if row.hidden
+        options[:style] = 'display: none'
+      end
+      dom_id = @view.dom_id(datum)
+      options[:"data-datum-id"] = dom_id
       @view.content_tag('tr', content, options)
     end
 
