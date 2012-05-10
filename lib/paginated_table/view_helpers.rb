@@ -17,9 +17,9 @@ module PaginatedTable
       description_proc.call(self) if description_proc
     end
 
-    def row(*args, &block)
+    def row(options = {}, &block)
       @explicit_rows = true
-      create_row(args, block)
+      create_row(options, block)
     end
 
     def column(*args, &block)
@@ -33,8 +33,8 @@ module PaginatedTable
       @default_row ||= create_row
     end
 
-    def create_row(args = [], block = nil)
-      row = RowDescription.new(*args, &block)
+    def create_row(options = {}, block = nil)
+      row = RowDescription.new(options, block)
       @rows << row
       row
     end
@@ -132,11 +132,19 @@ module PaginatedTable
     end
 
     def render_table_header
-      @view.content_tag('thead', render_table_header_row)
+      @view.content_tag('thead', render_table_header_rows)
     end
 
-    def render_table_header_row
-      content = @description.columns.map { |column|
+    def render_table_header_rows
+      @description.rows.select { |row|
+        row.title == :header
+      }.map { |row|
+        render_table_header_row(row)
+      }.reduce(&:+)
+    end
+
+    def render_table_header_row(row)
+      content = row.columns.map { |column|
         render_table_header_column(column)
       }.reduce(&:+)
       @view.content_tag('tr', content)
@@ -166,16 +174,26 @@ module PaginatedTable
 
     def render_table_body
       content = @data_page.data.map { |datum|
-        render_table_body_row(datum)
+        render_table_body_rows(datum)
       }.reduce(&:+)
       @view.content_tag('tbody', content)
     end
 
-    def render_table_body_row(datum)
-      content = @description.columns.map { |column|
+    def render_table_body_rows(datum)
+      @description.rows.map { |row|
+        render_table_body_row(row, datum)
+      }.reduce(&:+)
+    end
+
+    def render_table_body_row(row, datum)
+      content = row.columns.map { |column|
         render_table_body_cell(datum, column)
       }.reduce(&:+)
-      @view.content_tag('tr', content, :class => @view.cycle('odd', 'even'))
+      options = {}
+      if row.cycle
+        options[:class] = @view.cycle(*row.cycle)
+      end
+      @view.content_tag('tr', content, options)
     end
 
     def render_table_body_cell(datum, column)

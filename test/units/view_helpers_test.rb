@@ -85,7 +85,7 @@ module PaginatedTable
       it "constructs a new RowDescription and appends it to the rows array" do
         row = stub("row")
         options = stub("options")
-        RowDescription.stubs(:new).with(options).returns(row)
+        RowDescription.stubs(:new).with(options, nil).returns(row)
         description.row(options)
         description.rows.must_equal [row]
       end
@@ -320,21 +320,35 @@ module PaginatedTable
     end
 
     describe "#render_table_header" do
-      it "makes a thead with the table header row" do
-        table.stubs(:render_table_header_row).returns("<header/>")
+      it "makes a thead with the table header rows" do
+        table.stubs(:render_table_header_rows).returns("<header/>")
         view.expects(:content_tag).with('thead', "<header/>")
         table.render_table_header
       end
     end
 
+    describe "#render_table_header_rows" do
+      it "concatenates the table headers for the rows with :header titles" do
+        rows = [
+          stub("row", :title => :header),
+          stub("row", :title => false),
+          stub("row", :title => :header)
+        ]
+        description.stubs(:rows).returns(rows)
+        table.stubs(:render_table_header_row).with(rows.first).returns("<row1/>")
+        table.stubs(:render_table_header_row).with(rows.last).returns("<row2/>")
+        table.render_table_header_rows.must_equal "<row1/><row2/>"
+      end
+    end
+
     describe "#render_table_header_row" do
-      it "makes a tr with the table header columns" do
+      it "makes a tr with th columns" do
         columns = [stub("column1"), stub("column2")]
-        description.stubs(:columns).returns(columns)
+        row = stub("row", :columns => columns)
         table.stubs(:render_table_header_column).with(columns.first).returns("<col1/>")
         table.stubs(:render_table_header_column).with(columns.last).returns("<col2/>")
         view.expects(:content_tag).with('tr', "<col1/><col2/>")
-        table.render_table_header_row
+        table.render_table_header_row(row)
       end
     end
 
@@ -393,10 +407,21 @@ module PaginatedTable
         data = [stub("datum1"), stub("datum2")]
         data_page = stub("data_page", :data => data)
         table = RendersTable.new(view, description, data_page, link_renderer)
-        table.stubs(:render_table_body_row).with(data.first).returns("<row1/>")
-        table.stubs(:render_table_body_row).with(data.last).returns("<row2/>")
+        table.stubs(:render_table_body_rows).with(data.first).returns("<row1/>")
+        table.stubs(:render_table_body_rows).with(data.last).returns("<row2/>")
         view.expects(:content_tag).with('tbody', "<row1/><row2/>")
         table.render_table_body
+      end
+    end
+
+    describe "#render_table_body_rows" do
+      it "concatenates the interleaved table body rows for the rows" do
+        datum = stub("datum")
+        rows = [stub("row"), stub("row")]
+        description.stubs(:rows).returns(rows)
+        table.stubs(:render_table_body_row).with(rows.first, datum).returns("1")
+        table.stubs(:render_table_body_row).with(rows.last, datum).returns("2")
+        table.render_table_body_rows(datum).must_equal "12"
       end
     end
 
@@ -404,13 +429,14 @@ module PaginatedTable
       it "makes a tr with the table body cells" do
         datum = stub("datum")
         columns = [stub("column1"), stub("column2")]
-        description.stubs(:columns).returns(columns)
+        cycle = stub("cycle")
+        row = stub("row", :columns => columns, :cycle => %w(foo bar))
         table.stubs(:render_table_body_cell).with(datum, columns.first).returns("<cell1/>")
         table.stubs(:render_table_body_cell).with(datum, columns.last).returns("<cell2/>")
         css = stub("css")
-        view.stubs(:cycle).with('odd', 'even').returns(css)
+        view.stubs(:cycle).with('foo', 'bar').returns(css)
         view.expects(:content_tag).with('tr', "<cell1/><cell2/>", :class => css)
-        table.render_table_body_row(datum)
+        table.render_table_body_row(row, datum)
       end
     end
 
