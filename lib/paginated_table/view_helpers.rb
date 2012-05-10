@@ -18,60 +18,83 @@ module PaginatedTable
     end
 
     def row(*args, &block)
-      @rows << RowDescription.new(*args, &block)
+      @explicit_rows = true
+      create_row(args, block)
     end
 
     def column(*args, &block)
-      @columns << Column.new(*args, &block)
+      raise Invalid if @explicit_rows
+      default_row.column(*args, &block)
     end
 
-    class Column
-      attr_reader :name
+    private
 
-      def initialize(name, options = {}, &block)
-        @name = name
-        @block = block
-        @options = options
-      end
-
-      def render_header
-        @options.fetch(:title, @name.to_s.titleize)
-      end
-
-      def render_cell(datum)
-        if @block
-          @block.call(datum)
-        else
-          datum.send(@name)
-        end
-      end
-
-      def sortable?
-        @options.fetch(:sortable, true)
-      end
-
-      def html_attributes
-        html_attributes = {}
-        if @options[:class]
-          html_attributes[:class] = Array(@options[:class]).join(' ')
-        end
-        if @options[:style]
-          html_attributes[:style] = @options[:style]
-        end
-        html_attributes
-      end
-
+    def default_row
+      @default_row ||= create_row
     end
 
-    class RowDescription
-      attr_reader :title, :cycle, :hidden
+    def create_row(args = [], block = nil)
+      row = RowDescription.new(*args, &block)
+      @rows << row
+      row
+    end
 
-      def initialize(options)
-        @title = options.fetch(:title, :header)
-        @cycle = options.fetch(:cycle, %w(odd even))
-        @hidden = options.fetch(:hidden, false)
+    class Invalid < StandardError
+    end
+  end
+
+  class RowDescription
+    attr_reader :title, :cycle, :hidden, :columns
+
+    def initialize(options, description_proc)
+      @title = options.fetch(:title, :header)
+      @cycle = options.fetch(:cycle, %w(odd even))
+      @hidden = options.fetch(:hidden, false)
+      @columns = []
+      description_proc.call(self) if description_proc
+    end
+
+    def column(*args, &block)
+      @columns << ColumnDescription.new(*args, &block)
+    end
+  end
+
+  class ColumnDescription
+    attr_reader :name
+
+    def initialize(name, options = {}, &block)
+      @name = name
+      @block = block
+      @options = options
+    end
+
+    def render_header
+      @options.fetch(:title, @name.to_s.titleize)
+    end
+
+    def render_cell(datum)
+      if @block
+        @block.call(datum)
+      else
+        datum.send(@name)
       end
     end
+
+    def sortable?
+      @options.fetch(:sortable, true)
+    end
+
+    def html_attributes
+      html_attributes = {}
+      if @options[:class]
+        html_attributes[:class] = Array(@options[:class]).join(' ')
+      end
+      if @options[:style]
+        html_attributes[:style] = @options[:style]
+      end
+      html_attributes
+    end
+
   end
 
   class RendersTable

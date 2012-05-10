@@ -32,32 +32,60 @@ module PaginatedTable
   describe TableDescription do
     let(:description) { TableDescription.new }
 
-    describe "#initialize" do
-      it "creates a new instance with empty columns" do
-        TableDescription.new.columns.must_equal []
-      end
-
-      it "calls the given block with itself" do
-        fake_proc = stub("proc")
-        fake_proc.expects(:call)
-        TableDescription.new(fake_proc)
-      end
-    end
-
     describe "#column" do
-      it "constructs a new Column and appends it to the columns array" do
-        column = stub("column")
-        TableDescription::Column.stubs(:new).with(:foo).returns(column)
-        description.column(:foo)
-        description.columns.must_equal [column]
+      let(:row) { row = stub("row", :column => nil) }
+
+      before do
+        RowDescription.stubs(:new => row)
       end
+
+      describe "when first called in a table description" do
+        it "creates a new row" do
+          description.column
+          description.rows.must_equal [row]
+        end
+
+        it "calls column on the row" do
+          args = [stub("arg1"), stub("arg2")]
+          row.expects(:column).with(*args)
+          description.column(*args)
+        end
+      end
+
+      describe "when subsequently called in a table description" do
+        before do
+          description.column
+        end
+
+        it "does not create a new row" do
+          description.expects(:row).never
+          description.column
+        end
+
+        it "calls column on the default row" do
+          args = [stub("arg1"), stub("arg2")]
+          row.expects(:column).with(*args)
+          description.column(*args)
+        end
+      end
+
+      describe "when called after row has been called by a table description" do
+        before do
+          description.row
+        end
+
+        it "raises TableDescription::Invalid" do
+          lambda { description.column }.must_raise TableDescription::Invalid
+        end
+      end
+
     end
 
     describe "#row" do
       it "constructs a new RowDescription and appends it to the rows array" do
         row = stub("row")
         options = stub("options")
-        TableDescription::RowDescription.stubs(:new).with(options).returns(row)
+        RowDescription.stubs(:new).with(options).returns(row)
         description.row(options)
         description.rows.must_equal [row]
       end
@@ -65,81 +93,24 @@ module PaginatedTable
 
   end
 
-  describe TableDescription::Column do
-    describe "#initialize" do
-      it "creates a new instance with a name and an optional block" do
-        TableDescription::Column.new(:foo) { true }
-      end
-
-      it "accepts an options hash" do
-        TableDescription::Column.new(:foo, :baz => 'bat')
-      end
-    end
-
-    describe "#sortable?" do
-      it "returns true by default" do
-        TableDescription::Column.new(:foo).sortable?.must_equal true
-      end
-
-      it "returns false if the :sortable option is false" do
-        TableDescription::Column.new(:foo, :sortable => false).sortable?.must_equal false
-      end
-    end
-
-    describe "#html_attributes" do
-      it "returns an empty hash by default" do
-        TableDescription::Column.new(:foo).html_attributes.must_equal({})
-      end
-
-      it "adds the css classes given by the :class option" do
-        TableDescription::Column.new(:foo, :class => %w(bar baz)).
-          html_attributes.must_equal({ :class => 'bar baz' })
-      end
-
-      it "adds the css styles given by the :style option" do
-        TableDescription::Column.new(:foo, :style => 'font-face: bold').
-          html_attributes.must_equal({ :style => 'font-face: bold' })
-      end
-    end
-
-    describe "#render_header" do
-      it "returns the titleized name" do
-        TableDescription::Column.new(:foo).render_header.must_equal "Foo"
-      end
-
-      it "returns the :title option if given" do
-        TableDescription::Column.new(:foo, :title => 'bar').
-          render_header.must_equal "bar"
-      end
-    end
-
-    describe "#render_cell" do
-      let(:results) { stub("results") }
-
-      describe "on a column with no block" do
-        let(:column) { TableDescription::Column.new(:foo) }
-
-        it "sends its name to the datum" do
-          datum = stub("datum", :foo => results)
-          column.render_cell(datum).must_equal results
-        end
-      end
-
-      describe "on a column with a block" do
-        it "calls its block with the datum" do
-          datum = stub("datum")
-          column = TableDescription::Column.new(:foo) do |block_arg|
-            results if block_arg == datum
-          end
-          column.render_cell(datum).must_equal results
-        end
-      end
-    end
-  end
-
-  describe TableDescription::RowDescription do
+  describe RowDescription do
+    let(:description_proc) { lambda {} }
     let(:options) { {} }
-    let(:description) { TableDescription::RowDescription.new(options) }
+    let(:description) {
+      RowDescription.new(options, description_proc)
+    }
+
+    describe "#initialize" do
+      it "creates a new instance with empty columns" do
+        description.columns.must_equal []
+      end
+
+      it "calls the given block with itself" do
+        fake_proc = stub("proc")
+        fake_proc.expects(:call)
+        RowDescription.new(options, fake_proc)
+      end
+    end
 
     describe "#title" do
       it "returns the title option" do
@@ -159,6 +130,88 @@ module PaginatedTable
       it "returns the hidden option" do
         options[:hidden] = hidden = stub("hidden")
         description.hidden.must_equal hidden
+      end
+    end
+
+    describe "#column" do
+      it "constructs a new ColumnDescription and appends it to the columns array" do
+        column = stub("column")
+        name = stub("name")
+        ColumnDescription.stubs(:new).with(name).returns(column)
+        description.column(name)
+        description.columns.must_equal [column]
+      end
+    end
+  end
+
+  describe ColumnDescription do
+    describe "#initialize" do
+      it "creates a new instance with a name and an optional block" do
+        ColumnDescription.new(:foo) { true }
+      end
+
+      it "accepts an options hash" do
+        ColumnDescription.new(:foo, :baz => 'bat')
+      end
+    end
+
+    describe "#sortable?" do
+      it "returns true by default" do
+        ColumnDescription.new(:foo).sortable?.must_equal true
+      end
+
+      it "returns false if the :sortable option is false" do
+        ColumnDescription.new(:foo, :sortable => false).sortable?.must_equal false
+      end
+    end
+
+    describe "#html_attributes" do
+      it "returns an empty hash by default" do
+        ColumnDescription.new(:foo).html_attributes.must_equal({})
+      end
+
+      it "adds the css classes given by the :class option" do
+        ColumnDescription.new(:foo, :class => %w(bar baz)).
+          html_attributes.must_equal({ :class => 'bar baz' })
+      end
+
+      it "adds the css styles given by the :style option" do
+        ColumnDescription.new(:foo, :style => 'font-face: bold').
+          html_attributes.must_equal({ :style => 'font-face: bold' })
+      end
+    end
+
+    describe "#render_header" do
+      it "returns the titleized name" do
+        ColumnDescription.new(:foo).render_header.must_equal "Foo"
+      end
+
+      it "returns the :title option if given" do
+        ColumnDescription.new(:foo, :title => 'bar').
+          render_header.must_equal "bar"
+      end
+    end
+
+    describe "#render_cell" do
+      let(:results) { stub("results") }
+
+      describe "on a column with no block" do
+        let(:column) { ColumnDescription.new(:foo) }
+
+        it "sends its name to the datum" do
+          datum = stub("datum", :foo => results)
+          column.render_cell(datum).must_equal results
+        end
+      end
+
+      describe "on a column with a block" do
+        it "calls its block with the datum" do
+          datum = stub("datum")
+          column = ColumnDescription.new(:foo) do |block_arg|
+            results if block_arg == datum
+          end
+          column.render_cell(datum).must_equal results
+        end
       end
     end
   end
