@@ -3,7 +3,7 @@ module PaginatedTable
     def paginated_table(data_page, &block)
       table_description = TableDescription.new(block)
       link_renderer = LinkRenderer.new(data_page.page)
-      table_renderer = RendersTable.new(self, table_description, data_page, link_renderer)
+      table_renderer = TableRenderer.new(self, table_description, data_page, link_renderer)
       table_renderer.render
     end
   end
@@ -97,7 +97,7 @@ module PaginatedTable
 
   end
 
-  class RendersTable
+  class TableRenderer
     def initialize(view, description, data_page, link_renderer)
       @view = view
       @description = description

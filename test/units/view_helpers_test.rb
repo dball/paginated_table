@@ -20,7 +20,7 @@ module PaginatedTable
         link_renderer = stub("link_renderer")
         LinkRenderer.stubs("new").with(page).returns(link_renderer)
         table_renderer = stub("table_renderer")
-        RendersTable.stubs("new").
+        TableRenderer.stubs("new").
           with(view, table_description, data_page, link_renderer).
           returns(table_renderer)
         table_renderer.expects("render")
@@ -259,14 +259,14 @@ module PaginatedTable
 
   end
 
-  describe RendersTable do
+  describe TableRenderer do
     let(:view) { stub("view") }
     let(:description) { stub("description") }
     let(:data) { stub("data") }
     let(:page) { stub("page", :sort_column => 'title', :sort_direction => 'asc') }
     let(:data_page) { stub("data_page", :data => data, :page => page) }
     let(:link_renderer) { stub("link_renderer") }
-    let(:table) { RendersTable.new(view, description, data_page, link_renderer) }
+    let(:table) { TableRenderer.new(view, description, data_page, link_renderer) }
 
     describe "#initialize" do
       it "creates a new instance with the view, description, and data_page" do
@@ -406,7 +406,7 @@ module PaginatedTable
       it "makes a tbody with the table body rows" do
         data = [stub("datum1"), stub("datum2")]
         data_page = stub("data_page", :data => data)
-        table = RendersTable.new(view, description, data_page, link_renderer)
+        table = TableRenderer.new(view, description, data_page, link_renderer)
         table.stubs(:render_table_body_rows).with(data.first).returns("<row1/>")
         table.stubs(:render_table_body_rows).with(data.last).returns("<row2/>")
         view.expects(:content_tag).with('tbody', "<row1/><row2/>")
