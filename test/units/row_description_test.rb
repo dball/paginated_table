@@ -42,6 +42,13 @@ module PaginatedTable
       end
     end
 
+    describe "#data_type" do
+      it "returns the data_type option" do
+        options[:data_type] = data_type = stub("data_type")
+        description.data_type.must_equal data_type
+      end
+    end
+
     describe "#colspan" do
       it "delegates to the table description" do
         colspan = stub("colspan")
@@ -58,17 +65,6 @@ module PaginatedTable
         ColumnDescription.stubs(:new).with(description, name).returns(column)
         description.column(name)
         description.columns.must_equal [column]
-      end
-    end
-
-    describe "#html_attributes" do
-      it "return empty hash by default" do
-        description.html_attributes.must_equal({})
-      end
-
-      it "sets the css style to display: none when hidden" do
-        options[:hidden] = true
-        description.html_attributes.must_equal(:style => 'display: none')
       end
     end
   end

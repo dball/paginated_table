@@ -98,6 +98,9 @@ module PaginatedTable
       if row.hidden
         options[:style] = 'display: none'
       end
+      if row.data_type
+        options[:"data-type"] = row.data_type
+      end
       dom_id = @view.dom_id(datum)
       options[:"data-datum-id"] = dom_id
       @view.content_tag('tr', content, options)

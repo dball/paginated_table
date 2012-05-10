@@ -171,6 +171,11 @@ module PaginatedTable
       let(:datum) { stub("datum") }
       let(:columns) { [stub("column1"), stub("column2")] }
       let(:dom_id) { stub("dom_id") }
+      let(:row) {
+        stub("row", :columns => columns, :cycle => false, :hidden => false,
+          :data_type => false
+        )
+      }
       before do
         view.stubs(:dom_id).with(datum).returns(dom_id)
         table.stubs(:render_table_body_cell).
@@ -180,26 +185,35 @@ module PaginatedTable
       end
 
       it "makes a tr with the table body cells" do
-        row = stub("row", :columns => columns, :cycle => false, :hidden => false)
         view.expects(:content_tag).
           with('tr', "<cell1/><cell2/>", :"data-datum-id" => dom_id)
         table.render_table_body_row(row, datum)
       end
 
-      it "makes a tr with a css cycle" do
+      it "makes a tr with a css cycle for cycle rows" do
         css = stub("css")
         view.stubs(:cycle).with('foo', 'bar').returns(css)
-        row = stub("row", :columns => columns, :cycle => %w(foo bar), :hidden => false)
+        row.stubs(:cycle => %w(foo bar))
         view.expects(:content_tag).
           with('tr', "<cell1/><cell2/>", :class => css, :"data-datum-id" => dom_id)
         table.render_table_body_row(row, datum)
       end
 
-      it "makes a tr with css style display: none" do
-        row = stub("row", :columns => columns, :cycle => nil, :hidden => true)
+      it "makes a tr with css style display: none for hidden rows" do
+        row.stubs(:hidden => true)
         view.expects(:content_tag).
           with('tr', "<cell1/><cell2/>",
             :style => 'display: none', :"data-datum-id" => dom_id
+          )
+        table.render_table_body_row(row, datum)
+      end
+
+      it "makes a tr with a data-type attribute for data_type rows" do
+        data_type = stub("data_type")
+        row.stubs(:data_type => data_type)
+        view.expects(:content_tag).
+          with('tr', "<cell1/><cell2/>",
+            :"data-datum-id" => dom_id, :"data-type" => data_type
           )
         table.render_table_body_row(row, datum)
       end

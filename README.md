@@ -151,6 +151,11 @@ Row options are:
       <td>Renders the row's column titles. If the value is :header, they will appear
           in the table header, otherwise they will not appear anywhere.</td>
     </tr>
+    <tr>
+      <th>:data_type</th>
+      <td>false</td>
+      <td>The attribute value for a data-type attribute</td>
+    </tr>
   </tbody>
 </table>
 

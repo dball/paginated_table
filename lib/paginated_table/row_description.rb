@@ -21,20 +21,16 @@ module PaginatedTable
       @options.fetch(:hidden, false)
     end
 
+    def data_type
+      @options.fetch(:data_type, false)
+    end
+
     def column(*args, &block)
       @columns << ColumnDescription.new(self, *args, &block)
     end
 
     def colspan(span)
       @table.colspan(span)
-    end
-    
-    def html_attributes
-      html_attributes = {}
-      if hidden
-        html_attributes[:style] = 'display: none'
-      end
-      html_attributes
     end
   end
 end
