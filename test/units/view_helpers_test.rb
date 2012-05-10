@@ -30,6 +30,8 @@ module PaginatedTable
   end
 
   describe TableDescription do
+    let(:description) { TableDescription.new }
+
     describe "#initialize" do
       it "creates a new instance with empty columns" do
         TableDescription.new.columns.must_equal []
@@ -46,11 +48,21 @@ module PaginatedTable
       it "constructs a new Column and appends it to the columns array" do
         column = stub("column")
         TableDescription::Column.stubs(:new).with(:foo).returns(column)
-        description = TableDescription.new
         description.column(:foo)
         description.columns.must_equal [column]
       end
     end
+
+    describe "#row" do
+      it "constructs a new RowDescription and appends it to the rows array" do
+        row = stub("row")
+        options = stub("options")
+        TableDescription::RowDescription.stubs(:new).with(options).returns(row)
+        description.row(options)
+        description.rows.must_equal [row]
+      end
+    end
+
   end
 
   describe TableDescription::Column do
@@ -121,6 +133,32 @@ module PaginatedTable
           end
           column.render_cell(datum).must_equal results
         end
+      end
+    end
+  end
+
+  describe TableDescription::RowDescription do
+    let(:options) { {} }
+    let(:description) { TableDescription::RowDescription.new(options) }
+
+    describe "#title" do
+      it "returns the title option" do
+        options[:title] = title = stub("title")
+        description.title.must_equal title
+      end
+    end
+
+    describe "#cycle" do
+      it "returns the cycle option" do
+        options[:cycle] = cycle = stub("cycle")
+        description.cycle.must_equal cycle
+      end
+    end
+
+    describe "#hidden" do
+      it "returns the hidden option" do
+        options[:hidden] = hidden = stub("hidden")
+        description.hidden.must_equal hidden
       end
     end
   end

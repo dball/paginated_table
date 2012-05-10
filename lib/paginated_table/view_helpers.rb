@@ -9,11 +9,16 @@ module PaginatedTable
   end
 
   class TableDescription
-    attr_reader :columns
+    attr_reader :columns, :rows
 
     def initialize(description_proc = nil)
       @columns = []
+      @rows = []
       description_proc.call(self) if description_proc
+    end
+
+    def row(*args, &block)
+      @rows << RowDescription.new(*args, &block)
     end
 
     def column(*args, &block)
@@ -56,6 +61,16 @@ module PaginatedTable
         html_attributes
       end
 
+    end
+
+    class RowDescription
+      attr_reader :title, :cycle, :hidden
+
+      def initialize(options)
+        @title = options.fetch(:title, :header)
+        @cycle = options.fetch(:cycle, %w(odd even))
+        @hidden = options.fetch(:hidden, false)
+      end
     end
   end
 
