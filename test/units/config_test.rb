@@ -1,3 +1,5 @@
+require 'test_helper'
+
 module PaginatedTable
   describe "configuration" do
     let(:configuration) { PaginatedTable.configuration }

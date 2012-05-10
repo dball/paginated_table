@@ -1,3 +1,5 @@
+require 'test_helper'
+
 module PaginatedTable
   describe Page do
     let(:page) { Page.new(:number => 2, :rows => 5, :sort_column => 'name', :sort_direction => 'desc') }

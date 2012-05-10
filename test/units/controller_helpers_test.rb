@@ -1,3 +1,5 @@
+require 'test_helper'
+
 module PaginatedTable
   describe ControllerHelpers do
     let(:params) { stub("params") }
