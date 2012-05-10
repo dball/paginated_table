@@ -1,3 +1,8 @@
+# v0.0.7
+
+* Adds option to specify partial name
+* Cycles odd and even css classes on the table rows
+
 # v0.0.6
 
 * Columns may have :class and :style options

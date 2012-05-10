@@ -5,7 +5,10 @@ module PaginatedTable
       page = PageParams.create_page(params, defaults)
       data_page = DataPage.new(collection, page)
       instance_variable_set(:"@#{name}", data_page)
-      render :partial => name, :layout => false if request.xhr?
+      if request.xhr?
+        partial = options.fetch(:partial, name)
+        render :partial => partial, :layout => false
+      end
     end
   end
 end

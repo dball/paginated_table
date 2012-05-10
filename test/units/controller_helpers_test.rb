@@ -32,6 +32,13 @@ module PaginatedTable
         controller.paginated_table(name, collection)
       end
 
+      it "renders the given partial without layout if request is xhr?" do
+        partial = stub("partial")
+        request.stubs(:xhr? => true)
+        controller.expects(:render).with(:partial => partial, :layout => false)
+        controller.paginated_table(name, collection, :partial => partial)
+      end
+
       it "does not render if request is not xhr?" do
         request.stubs(:xhr? => false)
         controller.expects(:render).never
