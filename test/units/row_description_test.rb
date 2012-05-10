@@ -3,7 +3,7 @@ require 'test_helper'
 module PaginatedTable
   describe RowDescription do
     let(:table) { TableDescription.new }
-    let(:description_proc) { lambda {} }
+    let(:description_proc) { lambda { |row| nil } }
     let(:options) { {} }
     let(:description) {
       RowDescription.new(table, options, description_proc)
