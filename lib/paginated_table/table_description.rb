@@ -17,6 +17,11 @@ module PaginatedTable
       raise Invalid if @explicit_rows
       default_row.column(*args, &block)
     end
+    
+    def colspan(span)
+      raise ArgumentError unless span == :all
+      rows.map { |row| row.columns.length }.max.to_s
+    end
 
     private
 
@@ -25,7 +30,7 @@ module PaginatedTable
     end
 
     def create_row(options = {}, block = nil)
-      row = RowDescription.new(options, block)
+      row = RowDescription.new(self, options, block)
       @rows << row
       row
     end

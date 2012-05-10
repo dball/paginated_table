@@ -61,19 +61,54 @@ In `index.html.erb`:
 and in `products.html.erb`:
 
     <%= paginated_table(@products) do |table|
-          table.column :name, :sortable => false, :class => 'centered'
-          table.column :price, :style => 'font-face: bold' do |price|
+          table.column 'name', :sortable => false, :class => 'centered'
+          table.column 'price', :style => 'font-face: bold' do |price|
             format_currency(price)
           end
-          table.column :qty, :title => 'Quantity'
+          table.column 'qty', :title => 'Quantity'
         end %>
 
 The table DSL provides a column method by which you describe the table.
 The column calls correspond to columns in the rendered table. Columns
 with no block send their name to the records to get their cell values, while
 columns with blocks yield to them the records to get their cell values.
-Columns are sortable by default, but may be rendered unsortable with the
-:sortable option set to false.
+
+Column options are:
+
+<table>
+  <thead>
+    <th>Name</th>
+    <th>Default</th>
+    <th>Effect</th>
+  </thead>
+  <tbody>
+    <tr>
+      <th>:title</th>
+      <td>nil</td>
+      <td>Overrides the default title: the titleized column name</td>
+    </tr>
+    <tr>
+      <th>:sortable</th>
+      <td>true</td>
+      <td>Renders sort links in the column header, if present</td>
+    </tr>
+    <tr>
+      <th>:class</th>
+      <td>nil</td>
+      <td>The CSS class for the `td` elements</td>
+    </tr>
+    <tr>
+      <th>:style</th>
+      <td>nil</td>
+      <td>The CSS style for the `td` elements</td>
+    </tr>
+    <tr>
+      <th>:span</th>
+      <td>false</td>
+      <td>:all sets the colspan attribute value to the maximum number of columns in any row</td>
+    </tr>
+  </tbody>
+</table>
 
 Data may be rendered across multiple rows:
 

@@ -2,10 +2,11 @@ require 'test_helper'
 
 module PaginatedTable
   describe RowDescription do
+    let(:table) { TableDescription.new }
     let(:description_proc) { lambda {} }
     let(:options) { {} }
     let(:description) {
-      RowDescription.new(options, description_proc)
+      RowDescription.new(table, options, description_proc)
     }
 
     describe "#initialize" do
@@ -16,7 +17,7 @@ module PaginatedTable
       it "calls the given block with itself" do
         fake_proc = stub("proc")
         fake_proc.expects(:call)
-        RowDescription.new(options, fake_proc)
+        RowDescription.new(table, options, fake_proc)
       end
     end
 
@@ -41,11 +42,20 @@ module PaginatedTable
       end
     end
 
+    describe "#colspan" do
+      it "delegates to the table description" do
+        colspan = stub("colspan")
+        arg = stub("arg")
+        table.stubs(:colspan).with(arg).returns(colspan)
+        description.colspan(arg).must_equal colspan
+      end
+    end
+
     describe "#column" do
       it "constructs a new ColumnDescription and appends it to the columns array" do
         column = stub("column")
         name = stub("name")
-        ColumnDescription.stubs(:new).with(name).returns(column)
+        ColumnDescription.stubs(:new).with(description, name).returns(column)
         description.column(name)
         description.columns.must_equal [column]
       end

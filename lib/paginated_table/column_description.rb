@@ -2,7 +2,8 @@ module PaginatedTable
   class ColumnDescription
     attr_reader :name
 
-    def initialize(name, options = {}, &block)
+    def initialize(row, name, options = {}, &block)
+      @row = row
       @name = name
       @block = block
       @options = options
@@ -24,6 +25,10 @@ module PaginatedTable
       @options.fetch(:sortable, true)
     end
 
+    def span
+      @options.fetch(:span, false)
+    end
+
     def html_attributes
       html_attributes = {}
       if @options[:class]
@@ -31,6 +36,9 @@ module PaginatedTable
       end
       if @options[:style]
         html_attributes[:style] = @options[:style]
+      end
+      if span
+        html_attributes[:colspan] = @row.colspan(span)
       end
       html_attributes
     end

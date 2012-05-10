@@ -8,7 +8,7 @@ module PaginatedTable
       let(:row) { row = stub("row", :column => nil) }
 
       before do
-        RowDescription.stubs(:new => row)
+        RowDescription.stubs(:new).returns(row)
       end
 
       describe "when first called in a table description" do
@@ -57,9 +57,31 @@ module PaginatedTable
       it "constructs a new RowDescription and appends it to the rows array" do
         row = stub("row")
         options = stub("options")
-        RowDescription.stubs(:new).with(options, nil).returns(row)
+        RowDescription.stubs(:new).with(description, options, nil).returns(row)
         description.row(options)
         description.rows.must_equal [row]
+      end
+    end
+
+    describe "#colspan" do
+      before do
+        description.row do |row|
+          row.column 'foo'
+          row.column 'bar'
+        end
+        description.row do |row|
+          row.column 'foo'
+          row.column 'bar'
+          row.column 'baz'
+        end
+      end
+
+      it "returns the maximum number of columns in a row as a string for :all" do
+        description.colspan(:all).must_equal '3'
+      end
+
+      it "returns ArgumentError otherwise" do
+        lambda { description.colspan(:foo) }.must_raise ArgumentError
       end
     end
   end
