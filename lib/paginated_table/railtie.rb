@@ -11,6 +11,7 @@ module PaginatedTable
       end
       ActiveSupport.on_load :action_controller do
         require 'paginated_table/controller_helpers'
+        require 'paginated_table/page_params'
       end
     end
   end
