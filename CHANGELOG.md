@@ -1,3 +1,7 @@
+# v0.0.8
+
+* Fixes gemspec
+
 # v0.0.7
 
 * Adds :data_type option to row description
