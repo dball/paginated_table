@@ -1,3 +1,7 @@
+# v0.0.9
+
+* Adds :model_label option to table description
+
 # v0.0.8
 
 * Fixes gemspec

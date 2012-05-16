@@ -1,4 +1,4 @@
-<%= paginated_table(@data) do |t|
+<%= paginated_table @data, :model_label => 'product' do |t|
   t.row :title => :header, :cycle => %w(odd even) do |row|
     row.column 'name'
     row.column 'inspect', :title => 'Raw', :style => 'text-format: smallcaps'

@@ -2,7 +2,8 @@ module PaginatedTable
   class TableDescription
     attr_reader :columns, :rows
 
-    def initialize(description_proc = nil)
+    def initialize(options = {}, description_proc = nil)
+      @options = options
       @columns = []
       @rows = []
       description_proc.call(self) if description_proc
@@ -21,6 +22,10 @@ module PaginatedTable
     def colspan(span)
       raise ArgumentError unless span == :all
       rows.map { |row| row.columns.length }.max.to_s
+    end
+
+    def model_label
+      @options.fetch(:model_label, false)
     end
 
     private

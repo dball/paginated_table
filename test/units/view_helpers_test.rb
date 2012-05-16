@@ -9,6 +9,7 @@ module PaginatedTable
       view.stubs("params" => params)
       view
     }
+    let(:options) { stub("options") }
     let(:page) { stub("page") }
     let(:data_page) { stub("data_page", :page => page) }
     let(:description_block) { lambda {} }
@@ -16,7 +17,8 @@ module PaginatedTable
     describe "#paginated_table" do
       it "renders a table" do
         table_description = stub("table_description")
-        TableDescription.stubs("new").with(description_block).returns(table_description)
+        TableDescription.stubs("new").with(options, description_block).
+          returns(table_description)
         link_renderer = stub("link_renderer")
         LinkRenderer.stubs("new").with(page).returns(link_renderer)
         table_renderer = stub("table_renderer")
@@ -24,7 +26,7 @@ module PaginatedTable
           with(view, table_description, data_page, link_renderer).
           returns(table_renderer)
         table_renderer.expects("render")
-        view.paginated_table(data_page, &description_block)
+        view.paginated_table(data_page, options, &description_block)
       end
     end
   end

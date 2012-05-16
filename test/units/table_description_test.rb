@@ -2,7 +2,8 @@ require 'test_helper'
 
 module PaginatedTable
   describe TableDescription do
-    let(:description) { TableDescription.new }
+    let(:options) { {} }
+    let(:description) { TableDescription.new(options) }
 
     describe "#column" do
       let(:row) { row = stub("row", :column => nil) }
@@ -56,9 +57,9 @@ module PaginatedTable
     describe "#row" do
       it "constructs a new RowDescription and appends it to the rows array" do
         row = stub("row")
-        options = stub("options")
-        RowDescription.stubs(:new).with(description, options, nil).returns(row)
-        description.row(options)
+        row_options = stub("options")
+        RowDescription.stubs(:new).with(description, row_options, nil).returns(row)
+        description.row(row_options)
         description.rows.must_equal [row]
       end
     end
@@ -82,6 +83,13 @@ module PaginatedTable
 
       it "returns ArgumentError otherwise" do
         lambda { description.colspan(:foo) }.must_raise ArgumentError
+      end
+    end
+
+    describe "#model_label" do
+      it "returns the model_label option" do
+        options[:model_label] = model_label = stub("model_label")
+        description.model_label.must_equal model_label
       end
     end
   end

@@ -36,7 +36,10 @@ module PaginatedTable
 
     describe "#render_pagination_info" do
       it "makes a div.info with the page_entries_info from will_paginate" do
-        view.stubs(:page_entries_info).with(data).returns("<info/>")
+        model_label = stub("model_label")
+        description.stubs(:model_label).returns(model_label)
+        view.stubs(:page_entries_info).with(data, :model => model_label).
+          returns("<info/>")
         view.expects(:content_tag).with('div', "<info/>", :class => 'info')
         table.render_pagination_info
       end

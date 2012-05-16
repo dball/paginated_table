@@ -68,6 +68,29 @@ and in `products.html.erb`:
           table.column 'qty', :title => 'Quantity'
         end %>
 
+The first argument to paginated_table must be a paginated collection, or some
+other object conforming to the will_paginate collection interface. The second
+may be an options hash, including:
+
+<table>
+  <thead>
+    <th>Name</th>
+    <th>Default</th>
+    <th>Effect</th>
+  </thead>
+  <tbody>
+    <tr>
+      <th>:model_label</th>
+      <td>false</td>
+      <td>Explicitly sets the :model option when calling will_paginate's
+          page_entries_info method. This determines the string used in the
+          phrase, "Displaying 1-10 products", where :model_label is product.
+          The default behavior titleizes the name of the ActiveRecord model.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 The table DSL provides a column method by which you describe the table.
 The column calls correspond to columns in the rendered table. Columns
 with no block send their name to the records to get their cell values, while

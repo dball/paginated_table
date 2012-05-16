@@ -19,7 +19,8 @@ module PaginatedTable
     end
 
     def render_pagination_info
-      content = @view.page_entries_info(@data_page.data)
+      options = { :model => @description.model_label }
+      content = @view.page_entries_info(@data_page.data, options)
       @view.content_tag('div', content, :class => 'info')
     end
 
