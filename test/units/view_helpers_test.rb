@@ -17,12 +17,12 @@ module PaginatedTable
     describe "#paginated_table" do
       it "renders a table" do
         table_description = stub("table_description")
-        TableDescription.stubs("new").with(options, description_block).
+        View::TableDescription.stubs("new").with(options, description_block).
           returns(table_description)
         link_renderer = stub("link_renderer")
-        LinkRenderer.stubs("new").with(page).returns(link_renderer)
+        View::LinkRenderer.stubs("new").with(page).returns(link_renderer)
         table_renderer = stub("table_renderer")
-        TableRenderer.stubs("new").
+        View::TableRenderer.stubs("new").
           with(view, table_description, data_page, link_renderer).
           returns(table_renderer)
         table_renderer.expects("render")

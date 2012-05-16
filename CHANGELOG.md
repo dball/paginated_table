@@ -1,3 +1,7 @@
+# v0.0.10
+
+* Moves view objects into View module and directory
+
 # v0.0.9
 
 * Adds :model_label option to table description

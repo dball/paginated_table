@@ -15,20 +15,20 @@ Gem::Specification.new do |s|
 
   s.files = [
     'lib/paginated_table.rb',
-    'lib/paginated_table/column_description.rb',
     'lib/paginated_table/config.rb',
     'lib/paginated_table/controller_helpers.rb',
     'lib/paginated_table/data_page.rb',
     'lib/paginated_table/engine.rb',
-    'lib/paginated_table/link_renderer.rb',
     'lib/paginated_table/page.rb',
     'lib/paginated_table/page_params.rb',
     'lib/paginated_table/railtie.rb',
-    'lib/paginated_table/row_description.rb',
-    'lib/paginated_table/table_description.rb',
-    'lib/paginated_table/table_renderer.rb',
     'lib/paginated_table/version.rb',
     'lib/paginated_table/view_helpers.rb',
+    'lib/paginated_table/view/table_description.rb',
+    'lib/paginated_table/view/row_description.rb',
+    'lib/paginated_table/view/column_description.rb',
+    'lib/paginated_table/view/link_renderer.rb',
+    'lib/paginated_table/view/table_renderer.rb',
     'vendor/assets/javascripts/paginated_table.js'
   ]
   s.test_files = Dir["test/**/*"]
