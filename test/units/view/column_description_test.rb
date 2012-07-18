@@ -20,12 +20,23 @@ module PaginatedTable
 
       describe "#sortable?" do
         it "returns true by default" do
-          description.sortable?.must_equal true
+          description.must_be :sortable?
         end
 
         it "returns the :sortable option" do
-          options[:sortable] = sortable = stub("sortable")
-          description.sortable?.must_equal sortable
+          options[:sortable] = false
+          description.wont_be :sortable?
+        end
+      end
+
+      describe "#filterable?" do
+        it "returns false by default" do
+          description.wont_be :filterable?
+        end
+
+        it "returns true if anything was passed in the :filter option" do
+          options[:filter] = stub("filters")
+          description.must_be :filterable?
         end
       end
 

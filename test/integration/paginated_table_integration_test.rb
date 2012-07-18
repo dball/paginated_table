@@ -208,6 +208,13 @@ describe "paginated_table integration" do
     end
   end
 
+  describe "filtering" do
+    it "loads the filtering page" do
+      visit "/filters"
+      page.has_xpath?("#{th_xpath(1)}/select").must_equal true
+    end
+  end
+
   def pagination_xpath
     "//div[@class='paginated_table']"
   end

@@ -9,7 +9,11 @@ module PaginatedTable
       let(:page) { stub("page", :sort_column => 'title', :sort_direction => 'asc') }
       let(:data_page) { stub("data_page", :data => data, :page => page) }
       let(:link_renderer) { stub("link_renderer") }
-      let(:table) { TableRenderer.new(view, description, data_page, link_renderer) }
+      let(:safe_buffer_creator) { lambda { "" } }
+      let(:table) {
+        TableRenderer.new(view, description, data_page, link_renderer,
+                          :safe_buffer_creator => safe_buffer_creator)
+      }
 
       describe "#initialize" do
         it "creates a new instance with the view, description, and data_page" do
@@ -129,21 +133,40 @@ module PaginatedTable
       end
 
       describe "#render_table_header_column_content" do
-        describe "with a sortable column" do
-          let(:column) { stub("column", :name => :foo, :render_header => '<header/>', :sortable? => true) }
+        let(:column_options) { {
+          :name => 'foo',
+          :render_header => '<header/>',
+          :sortable? => true,
+          :filterable? => false
+        } }
+        let(:column) { stub("column", column_options) }
 
+        describe "with a sortable column" do
           it "asks the link renderer to render a link to sort the column" do
-            result = stub("result")
-            link_renderer.stubs(:sort_link).with("<header/>", 'foo').returns(result)
-            table.render_table_header_column_content(column).must_equal result
+            link_renderer.stubs(:sort_link).with("<header/>", 'foo').returns("<link/>")
+            table.render_table_header_column_content(column).must_equal '<link/>'
           end
         end
 
         describe "with an unsortable column" do
-          let(:column) { stub("column", :render_header => '<header/>', :sortable? => false) }
+          before do
+            column_options[:sortable?] = false
+          end
 
           it "simply renders the column's header" do
             table.render_table_header_column_content(column).must_equal '<header/>'
+          end
+        end
+
+        describe "with a filterable, unsortable column" do
+          before do
+            column_options[:sortable?] = false
+            column_options[:filterable?] = true
+          end
+
+          it "renders a select box next to the sort link" do
+            view.stubs(:select_tag).with('foo', []).returns('<select/>')
+            table.render_table_header_column_content(column).must_equal '<header/><select/>'
           end
         end
       end

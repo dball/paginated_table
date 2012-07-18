@@ -26,6 +26,10 @@ module PaginatedTable
         @options.fetch(:sortable, true)
       end
 
+      def filterable?
+        !!@options.fetch(:filter, false)
+      end
+
       def span
         @options.fetch(:span, false)
       end

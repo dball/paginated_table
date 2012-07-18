@@ -1,11 +1,14 @@
 module PaginatedTable
   module View
     class TableRenderer
-      def initialize(view, description, data_page, link_renderer)
+      def initialize(view, description, data_page, link_renderer, options = {})
         @view = view
         @description = description
         @data_page = data_page
         @link_renderer = link_renderer
+        @safe_buffer_creator = options.fetch(:safe_buffer_creator) {
+          ActiveSupport::SafeBuffer.method(:new)
+        }
       end
 
       def render
@@ -68,11 +71,19 @@ module PaginatedTable
       end
 
       def render_table_header_column_content(column)
-        text = column.render_header
-        if column.sortable?
-          @link_renderer.sort_link(text, column.name.to_s)
-        else
-          text
+        with_safe_buffer do |buffer|
+          text = column.render_header
+          name = column.name.to_s
+          if column.sortable?
+            buffer << @link_renderer.sort_link(text, name)
+          else
+            buffer << text
+          end
+          if column.filterable?
+            buffer << @view.select_tag(name, [])
+          else
+            buffer << ''
+          end
         end
       end
 
@@ -111,6 +122,15 @@ module PaginatedTable
       def render_table_body_cell(datum, column)
         @view.content_tag('td', column.render_cell(datum), column.html_attributes)
       end
+
+      private
+
+      def with_safe_buffer
+        safe_buffer = @safe_buffer_creator.call
+        yield safe_buffer
+        safe_buffer
+      end
+
     end
   end
 end

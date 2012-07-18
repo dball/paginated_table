@@ -11,6 +11,10 @@ class DataController < ApplicationController
     paginated_table('data', data(range), :defaults => { :sort_column => 'id' })
   end
 
+  def filters
+    paginated_table('data', data(1..100), :defaults => { :sort_column => 'id' })
+  end
+
   private
 
   class Datum < Struct.new(:id, :name)
