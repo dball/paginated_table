@@ -131,27 +131,21 @@ describe "paginated_table integration" do
       it "follows the link to sort the first column in ascending order" do
         visit "/data"
         click_link "Name"
-        [1, 10, 100, 11, 12, 13, 14, 15, 16, 17].each_with_index do |row, i|
-          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
-        end
+        name_column_must_contain(1, 10, 100, 11, 12, 13, 14, 15, 16, 17)
       end
 
       it "follows the link to sort the first column twice in descending order" do
         visit "/data"
         click_link "Name"
         click_link "Name"
-        [99, 98, 97, 96, 95, 94, 93, 92, 91, 90].each_with_index do |row, i|
-          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
-        end
+        name_column_must_contain(99, 98, 97, 96, 95, 94, 93, 92, 91, 90)
       end
 
       it "follows the link to sort the first column, then to the second page" do
         visit "/data"
         click_link "Name"
         click_link "2"
-        [18, 19, 2, 20, 21, 22, 23, 24, 25, 26].each_with_index do |row, i|
-          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
-        end
+        name_column_must_contain(18, 19, 2, 20, 21, 22, 23, 24, 25, 26)
       end
 
       it "has no link to sort the second column" do
@@ -169,9 +163,7 @@ describe "paginated_table integration" do
         visit "/data"
         click_link "Name"
         wait_for_ajax_request
-        [1, 10, 100, 11, 12, 13, 14, 15, 16, 17].each_with_index do |row, i|
-          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
-        end
+        name_column_must_contain(1, 10, 100, 11, 12, 13, 14, 15, 16, 17)
       end
 
       it "follows the link to sort the first column twice in descending order" do
@@ -180,9 +172,7 @@ describe "paginated_table integration" do
         wait_for_ajax_request
         click_link "Name"
         wait_for_ajax_request
-        [99, 98, 97, 96, 95, 94, 93, 92, 91, 90].each_with_index do |row, i|
-          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
-        end
+        name_column_must_contain(99, 98, 97, 96, 95, 94, 93, 92, 91, 90)
       end
 
       it "follows the link to sort the first column, then to the second page" do
@@ -191,9 +181,7 @@ describe "paginated_table integration" do
         wait_for_ajax_request
         click_link "2"
         wait_for_ajax_request
-        [18, 19, 2, 20, 21, 22, 23, 24, 25, 26].each_with_index do |row, i|
-          page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
-        end
+        name_column_must_contain(18, 19, 2, 20, 21, 22, 23, 24, 25, 26)
       end
     end
   end
@@ -202,27 +190,21 @@ describe "paginated_table integration" do
     it "limits the results" do
       visit "/data?search=secondhalf"
       pagination_info_text.must_equal "Displaying Data 1 - 10 of 50 in total"
-      (51..60).each_with_index do |id, index|
-        page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
-      end
+      name_column_must_contain(*(51..60).to_a)
     end
 
     it "following the page links preserves the search criteria" do
       visit "/data?search=secondhalf"
       click_link "2"
       pagination_info_text.must_equal "Displaying Data 11 - 20 of 50 in total"
-      (61..70).each_with_index do |id, index|
-        page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
-      end
+      name_column_must_contain(*(61..70).to_a)
     end
 
     it "following the sort links preserves the search criteria" do
       visit "/data?search=secondhalf"
       click_link "Name"
       pagination_info_text.must_equal "Displaying Data 1 - 10 of 50 in total"
-      [100, 51, 52, 53, 54, 55, 56, 57, 58, 59].each_with_index do |id, index|
-        page.has_xpath?("#{tr_xpath(index + 1)}/td[1][.='Name #{id}']").must_equal true
-      end
+      name_column_must_contain(100, 51, 52, 53, 54, 55, 56, 57, 58, 59)
     end
   end
 
@@ -270,6 +252,12 @@ describe "paginated_table integration" do
   def wait_for_ajax_request
     wait_until do
       page.evaluate_script('jQuery.active') == 0
+    end
+  end
+
+  def name_column_must_contain(*args)
+    args.each_with_index do |row, i|
+      page.has_xpath?("#{tr_xpath(i + 1)}/td[1][.='Name #{row}']").must_equal true
     end
   end
 end
